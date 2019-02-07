@@ -266,13 +266,7 @@ ComWann/ComWann
 ComDC/ComDC
 ComCoulomb/ComCoulomb
 gw/rspflapw.exe
-bin/ComCoulomb
-bin/rspflapw.exe
-bin/ComLowH
-bin/ComWann
-bin/ComDC
-bin/EVALSIM
-bin/CTQMC
+bin/*
 ComCTQMC/ctqmc/CPU/CTQMC
 ComCTQMC/evalsim/EVALSIM
 wannier90_2.1/libwannier.a
