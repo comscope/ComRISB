@@ -1,12 +1,12 @@
 TEXT band structure calculation
-CONTROL   iter_dft= 80  iter_hf=  0  iter_gw=  0 iter_qp=  0
+CONTROL   iter_dft= 50  iter_hf=  0  iter_gw=  0 iter_qp=  0
           admix=0.100  adspin=0.600 adm_gw=0.050 acc_it_gw=0.10
           iexch=005 scal_spin= 1.0000
           nproc_tau=   1 nproc_k=   16
           irel=1 clight=274.074e+00 rel_interst=F irel_core=1
           temperature=    300.00  restart=F
 FILES
-  allfile=mdl.
+  allfile=MnO
 SYM symgen=I_R4[0.0,1.0,0.0]_R2[1.0,0.0,0.0]_R3[1.0,-1.0,1.0]_
 STRUCTURE  par=  1.0000000  natom=  2 nsort=  2 istruct= -3
       is=  1  2
