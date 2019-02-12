@@ -651,6 +651,7 @@ t_t1_x.o:t_t1_x.F
 
 $(PROG) : $(mod_files) $(o_files)
 	$(link) $(o_files) -o $(PROG) $(LIB)
+	mkdir -p ../bin
 	cp $(PROG) ../bin
 
 .o.mod:

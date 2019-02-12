@@ -67,6 +67,7 @@ TARGET = ComWann
 
 $(TARGET): $(mod_files) $(o_files)
 	$(link) $(o_files) -o $(TARGET) $(LIB)
+	mkdir -p ../bin
 	cp $(TARGET) ../bin
 
 .f90.o:
