@@ -194,6 +194,9 @@ c         generators. This string will be parsed in subroutine group.
       allocate(tau(3,natom))
       allocate(txtel(nsort))
       allocate(z(nsort))
+      ! yxy begin
+      allocate(ncshells(nsort))
+      ! yxy end
       allocate(z_dop(nsort))
       allocate(zcor(nsort))
       allocate(magn_shift(nsort))
@@ -553,6 +556,11 @@ c ------- Reading the type of the functions for L <= L_b ------
         call brdcst(msgint,ntle,4*nsort*(maxb+1),master,MPI_COMM_WORLD)
 #endif        
       endif
+      ! yxy begin
+      do isort=1,nsort
+        ncshells(isort)=ncshells_full(nint(z(isort)))
+      enddo
+      ! yxy end
       z=z+z_dop
 #ifdef USE_HDF5
 c      call fopen('gwl.dat',fid_dat)

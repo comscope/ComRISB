@@ -1,15 +1,15 @@
       subroutine afteread
-	use atom_mod
-	use manager_mod
-	use parallel_mod
+      use atom_mod
+      use manager_mod
+      use parallel_mod
       use solid_mod
-	use units_mod
-	implicit none
-	integer :: iatom,i,info,nff,nef,isort,iz,l,nl,nlm,n,ind,li,ie,ii,
-     &	         jj,ii2,ndim,j,lm,m,ndimb
+      use units_mod
+      implicit none
+      integer :: iatom,i,info,nff,nef,isort,iz,l,nl,nlm,n,ind,li,ie,ii,
+     &               jj,ii2,ndim,j,lm,m,ndimb
       real*8 :: am(103),aa,bb,cc,ro_el_0
-	integer, allocatable :: ipiv(:)
-	real*8, allocatable :: a(:)
+      integer, allocatable :: ipiv(:)
+      real*8, allocatable :: a(:)
       DATA Am/  1.0079D0,  4.0026D0,  6.941D0,  9.01218D0,  10.81D0,
      &        12.011D0,   14.0067D0,  15.999D0, 18.998403D0,   20.17D0,
      &        22.98977D0, 24.305D0,  26.98154D0, 28.085D0,   30.97376D0,
@@ -43,7 +43,7 @@ c     *******************************************************
           lm_general(li,m)=lm
         enddo
       enddo
-	allocate(ipiv(3))
+      allocate(ipiv(3))
       call dcopy(3*natom,tau,1,stau,1)
       if(istruc.lt.0) then
         istruc=-istruc
@@ -58,7 +58,7 @@ c     *******************************************************
       else
         allocate(a(9))
         call dcopy(9,rbas,1,a,1)
-	  call dgesv(3,natom,a,3,ipiv,stau,3,info)
+        call dgesv(3,natom,a,3,ipiv,stau,3,info)
         deallocate(a)
       endif
       if(b_extval>1.d-8) then
@@ -129,16 +129,16 @@ c     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       call cross(gbas(1,2),rbas(1,3),rbas(1,1))
       call cross(gbas(1,3),rbas(1,1),rbas(1,2))
       amega=rbas(1,1)*gbas(1,1)+gbas(2,1)*rbas(2,1)
-     &	                       +gbas(3,1)*rbas(3,1)
-	par=par*v_v0**(1.d0/3.d0)
+     &                             +gbas(3,1)*rbas(3,1)
+      par=par*v_v0**(1.d0/3.d0)
       amega=abs(amega)*par**3
       do isort=1,nsort
         if(smt(isort)>=0.d0) then
-	    smt(isort)=smt(isort)*v_v0**(1.d0/3.d0)
+          smt(isort)=smt(isort)*v_v0**(1.d0/3.d0)
         else if(smt(isort)<0.d0) then
-	    smt(isort)=-smt(isort)
-	  endif
-	enddo
+          smt(isort)=-smt(isort)
+        endif
+      enddo
 c     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       do isort=1,nsort
          iz=idnint(z(isort))
@@ -146,39 +146,39 @@ c     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
          if(iz==0) amass(isort)=0.d0
       enddo
 c ------- Core information --------------------------------------------
-	ncormax=0
-	ncormmax=0
-	ncor_tot=0
+      ncormax=0
+      ncormmax=0
+      ncor_tot=0
       do isort=1,nsort
-	  zcor(isort)=0.d0
-	  ncor(isort)=0
-	  ncorm(isort)=0
-	  lc_max(isort)=-1
-	  do l=0,lmb(isort)
-	    nl=1
-		  if(irel_core.eq.2.and.l.ne.0) nl=2
-	    nlm=nrel_core*(l+l+1)
-	    do n=l+1,konfig(l,isort)-1
-	      zcor(isort)=zcor(isort)+2.d0*(l+l+1.d0)
-	      ncor(isort)=ncor(isort)+nl
-	      ncorm(isort)=ncorm(isort)+nlm
-	      lc_max(isort)=max(lc_max(isort),l)
-	    enddo
-	  enddo
-	  ncormax=max(ncormax,ncor(isort))
-	  ncormmax=max(ncormmax,ncorm(isort))
-	  ncor_tot=ncor_tot+ncorm(isort)*nhsort(isort)
+        zcor(isort)=0.d0
+        ncor(isort)=0
+        ncorm(isort)=0
+        lc_max(isort)=-1
+        do l=0,lmb(isort)
+          nl=1
+              if(irel_core.eq.2.and.l.ne.0) nl=2
+          nlm=nrel_core*(l+l+1)
+          do n=l+1,konfig(l,isort)-1
+            zcor(isort)=zcor(isort)+2.d0*(l+l+1.d0)
+            ncor(isort)=ncor(isort)+nl
+            ncorm(isort)=ncorm(isort)+nlm
+            lc_max(isort)=max(lc_max(isort),l)
+          enddo
+        enddo
+        ncormax=max(ncormax,ncor(isort))
+        ncormmax=max(ncormmax,ncorm(isort))
+        ncor_tot=ncor_tot+ncorm(isort)*nhsort(isort)
       enddo
-	maxl_cor=maxval(lc_max)
-	ind=1
-	do iatom=1,natom
-	  isort=is(iatom)
-	  io_cor(iatom)=ind
-	  ind=ind+ncorm(isort)
-	enddo
+      maxl_cor=maxval(lc_max)
+      ind=1
+      do iatom=1,natom
+        isort=is(iatom)
+        io_cor(iatom)=ind
+        ind=ind+ncorm(isort)
+      enddo
 c ------------------------------------------------------------------
-	allocate(ri(0:20))
-	allocate(rr(0:20))
+      allocate(ri(0:20))
+      allocate(rr(0:20))
       rr(0)=1.d0
       ri(0)=0.d0
       do l=1,20
@@ -193,7 +193,7 @@ c
 c
 c                 NSPMAG
 c
-	nspmag=max(magn,nspin)
+      nspmag=max(magn,nspin)
 c
 c                 NELEC - The number of valence electrons
 c
@@ -201,84 +201,85 @@ c
       do isort=1,nsort
         aa=0.d0
         do li=1,nrel*lmb(isort)+1
-	    if(irel.le.1) then
-	      l=li-1
-	    else
-	      l=li/2
-	    endif
+          if(irel.le.1) then
+            l=li-1
+          else
+            l=li/2
+          endif
           do ie=1,ntle(l,isort)
-	      if(l==0) aa=aa+atoc(ie,l,isort)
-	      if(l>0) aa=aa+atoc(ie,l,isort)/nrel
-	    enddo
-	  enddo
-	  nelec=nelec+(aa+z_dop(isort))*nhsort(isort)
+            if(l==0) aa=aa+atoc(ie,l,isort)
+            if(l>0) aa=aa+atoc(ie,l,isort)/nrel
+          enddo
+        enddo
+        nelec=nelec+(aa+z_dop(isort))*nhsort(isort)
       enddo
+
 c ------- Valence information --------------------------------------------
-	maxel=0
-	maxlfun=0
-	nfun=0
-	nfun0=0
-	nlb=0
-	nlb2=0
-	nlb20=0
+      maxel=0
+      maxlfun=0
+      nfun=0
+      nfun0=0
+      nlb=0
+      nlb2=0
+      nlb20=0
       do isort=1,nsort
-	  lfun(isort)=0
-	  lfunm(isort)=0
-	  do li=1,nrel*lmb(isort)+1
+        lfun(isort)=0
+        lfunm(isort)=0
+        do li=1,nrel*lmb(isort)+1
           if(irel.ne.2) then
-		    l=li-1
+                l=li-1
             nlm=l+l+1
           else if(irel.eq.2) then
-		    l=li/2
+                l=li/2
             nlm=((li+1)/2)*2
-	    endif
-	    do ie=1,ntle(l,isort)
-	      lfun(isort)=lfun(isort)+1
-	      lfunm(isort)=lfunm(isort)+nlm
-	      if(augm(ie,l,isort)=='LOC') then
-	        indfun0(1,ie,li,isort)=lfun(isort)
-	      else if(augm(ie,l,isort)/='LOC') then
-	        indfun0(1,ie,li,isort)=lfun(isort)
-	        lfun(isort)=lfun(isort)+1
-	        lfunm(isort)=lfunm(isort)+nlm
-	        indfun0(2,ie,li,isort)=lfun(isort)
-	      endif
-	    enddo
-	  enddo
-	  maxel=max(maxel,lfunm(isort))
-	  maxlfun=max(maxlfun,lfun(isort))
-	  nfun=nfun+lfunm(isort)*nhsort(isort)
-	  nfun0=nfun0+lfunm(isort)
-	  nlb=nlb+(lmb(isort)+1)**2*nhsort(isort)
-	  nlb2=nlb2+(lmpb(isort)+1)**2*nhsort(isort)
-	  nlb20=nlb20+(lmpb(isort)+1)**2
+          endif
+          do ie=1,ntle(l,isort)
+            lfun(isort)=lfun(isort)+1
+            lfunm(isort)=lfunm(isort)+nlm
+            if(augm(ie,l,isort)=='LOC') then
+              indfun0(1,ie,li,isort)=lfun(isort)
+            else if(augm(ie,l,isort)/='LOC') then
+              indfun0(1,ie,li,isort)=lfun(isort)
+              lfun(isort)=lfun(isort)+1
+              lfunm(isort)=lfunm(isort)+nlm
+              indfun0(2,ie,li,isort)=lfun(isort)
+            endif
+          enddo
+        enddo
+        maxel=max(maxel,lfunm(isort))
+        maxlfun=max(maxlfun,lfun(isort))
+        nfun=nfun+lfunm(isort)*nhsort(isort)
+        nfun0=nfun0+lfunm(isort)
+        nlb=nlb+(lmb(isort)+1)**2*nhsort(isort)
+        nlb2=nlb2+(lmpb(isort)+1)**2*nhsort(isort)
+        nlb20=nlb20+(lmpb(isort)+1)**2
       enddo
-	allocate(iat_tel(nfun))
-	allocate(iso_tel(nfun0))
+      allocate(iat_tel(nfun))
+      allocate(iso_tel(nfun0))
 c ---------------------------------------------------------
-	ii=1
-	jj=1
-	ii2=1
-	do iatom=1,natom
-	  isort=is(iatom)
-	  iob(iatom)=ii
-	  iob2(iatom)=ii2
-	  io_lem(iatom)=jj
-	  ii=ii+(lmb(isort)+1)**2
-	  ii2=ii2+(lmpb(isort)+1)**2
-	  iat_tel(jj:jj+lfunm(isort)-1)=iatom
-	  jj=jj+lfunm(isort)
-	enddo
+      ii=1
+      jj=1
+      ii2=1
+      do iatom=1,natom
+        isort=is(iatom)
+        iob(iatom)=ii
+        iob2(iatom)=ii2
+        io_lem(iatom)=jj
+        ii=ii+(lmb(isort)+1)**2
+        ii2=ii2+(lmpb(isort)+1)**2
+        iat_tel(jj:jj+lfunm(isort)-1)=iatom
+        jj=jj+lfunm(isort)
+      enddo
 c ----------------------------------------------------
-	jj=1
-	ii2=1
-	do isort=1,nsort
-	  iob20(isort)=ii2
-	  io_lem0(isort)=jj
-	  ii2=ii2+(lmpb(isort)+1)**2
-	  iso_tel(jj:jj+lfunm(isort)-1)=isort
-	  jj=jj+lfunm(isort)
-	enddo
+      jj=1
+      ii2=1
+      do isort=1,nsort
+        iob20(isort)=ii2
+        io_lem0(isort)=jj
+        ii2=ii2+(lmpb(isort)+1)**2
+        iso_tel(jj:jj+lfunm(isort)-1)=isort
+        jj=jj+lfunm(isort)
+      enddo
 c ----------------------------------------------------
       nlcloc=0
       i=0
@@ -305,7 +306,7 @@ c ----------------------------------------------------
               nlctot(isort)=nlctot(isort)+nl
             endif
           enddo
-	  enddo
+        enddo
         max_bs=max_bs+2*nrel*(lmb(isort)+1)**2
       enddo
       maxtfun=i
@@ -368,14 +369,14 @@ c ----------------------------------------------------
         enddo
       enddo
 c -------  Core information ----------------------------------
-	maxnrad=0
-	maxmtcor=0
+      maxnrad=0
+      maxmtcor=0
       do isort=1,nsort
-	  maxmtcor=maxmtcor+(nrad(isort)+1)*ncor(isort)*nspin_0
-	  maxnrad=max(maxnrad,nrad(isort))
+        maxmtcor=maxmtcor+(nrad(isort)+1)*ncor(isort)*nspin_0
+        maxnrad=max(maxnrad,nrad(isort))
       enddo
-	deallocate(ipiv)
-	betta_t=1.d0/temperature/boltzman
+      deallocate(ipiv)
+      betta_t=1.d0/temperature/boltzman
 c ------ Here are things for the new augmentation procedure ----------
       allocate(n_e_apw(0:maxb,nsort))
       n_e_apw=0
@@ -401,17 +402,17 @@ c -----------------------------------------------------------
       enddo
 c -------- Number of semicore bands ------------------------------------
         n_semic=0
-	  do isort=1,nsort
-	    do l=0,lmb(isort)
-	      ii=n_e_apw(l,isort)  !! augmentation energy
-	      jj=int(ptnl(ii,l,isort,1))  !! corresp. princ.quant.number
-	      do ie=1,ntle(l,isort)
-	        if(augm(ie,l,isort)=='LOC') then
-	          j=int(ptnl(ie,l,isort,1))
-	          if(j<jj) n_semic=n_semic+nrel*(l+l+1)*nhsort(isort)
-	        endif
+        do isort=1,nsort
+          do l=0,lmb(isort)
+            ii=n_e_apw(l,isort)  !! augmentation energy
+            jj=int(ptnl(ii,l,isort,1))  !! corresp. princ.quant.number
+            do ie=1,ntle(l,isort)
+              if(augm(ie,l,isort)=='LOC') then
+                j=int(ptnl(ie,l,isort,1))
+                if(j<jj) n_semic=n_semic+nrel*(l+l+1)*nhsort(isort)
+              endif
             enddo
-	    enddo
-	  enddo
-	  ro_el_gas=(nelec-n_semic)/amega
+          enddo
+        enddo
+        ro_el_gas=(nelec-n_semic)/amega
       end

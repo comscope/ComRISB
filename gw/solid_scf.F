@@ -8,6 +8,10 @@
       implicit none
       logical :: correlation
       integer :: iexit1
+      ! yxy begin
+      real(8) :: eval1,eval2,e_froz_min 
+      ! yxy end
+
       maxqmt=maxel*(maxel+1)/2
       call rostart(r_atom,ro_atom)
       if (.not.restart) then
@@ -123,11 +127,27 @@ c	call write_gwl_bni
        call write_wan_bni
 #endif
 
-
-
 	  ubi_0=ubi
 	  iter=iter+1
       enddo   !!! over iter
+
+      ! yxy begin
+      ncoremax=nint(sum(ncshells*nhsort)-
+     &   (sum(z*nhsort)-nelec+sum(z_dop*nhsort))/2)
+      ncoremax=ncoremax*nrel
+      eval1=maxval(e_bnd(ncoremax,:,:))
+      eval2=maxval(e_bnd(ncoremax+1,:,:))
+      e_froz_min=((eval1+eval2)/2-chem_pot)*13.605691752d0
+      if(maswrk)then
+        open(27,file="wannier_win.dat",status="replace")
+        write(27,'(" e_froz_min(eV): ",f12.6," with gap: ",
+     &    f12.6," cidx: ",i0)')
+     &    e_froz_min,(eval2-eval1)*13.605691752d0,ncoremax
+        close(27)
+      endif
+      ! yxy end
+
+
 1010  format(/'                iteration ',i3/)
 1020  format(1x,i4,' elements discovered for lattice')
       end

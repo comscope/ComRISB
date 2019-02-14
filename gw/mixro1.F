@@ -67,7 +67,7 @@ c define charge convergency between iterations
       enddo   !!! over isort
       if(maswrk) then
         write(iun,1010)dz
-        print1010,dz
+        print 1010,dz
       endif
       dm=0.d0
       do isort=1,nsort
