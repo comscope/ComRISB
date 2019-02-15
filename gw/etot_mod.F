@@ -53,4 +53,7 @@
      &	                     sigc_tau(:,:,:,:),
      &                       so_const(:,:,:),
      &                       so_const_sr(:,:,:,:,:)
+      ! yxy begin
+      real*8 :: ebnd_val_x
+      ! yxy end
       end

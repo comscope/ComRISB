@@ -4,6 +4,9 @@ c -------- The VALENCE components of GW ENERGY ---------------------------------
 	use manager_mod
 	use parallel_mod
 	use solid_mod
+    ! yxy begin
+      use atom_mod
+    ! yxy end
 	use units_mod
       implicit none
 	integer, intent(in) :: ndim,k,ispin,ind_k
@@ -21,6 +24,10 @@ c -------- The VALENCE components of GW ENERGY ---------------------------------
 	  d_free_x=d_free_x+const
      &	                 *free_energy_x(e_bnd(i,k,ispin)-chem_pot)
 	enddo
+    ! yxy begin
+        ebnd_val_x=ebnd_val_x-const*sum(gx_tau(ncoremax+1:)*
+     &    e_bnd(ncoremax+1:,k,ispin))
+    ! yxy end
 	if(ubi/='dft') then
 	  tmp=0.d0
         do i=1,ndim

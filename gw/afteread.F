@@ -214,6 +214,12 @@ c
         nelec=nelec+(aa+z_dop(isort))*nhsort(isort)
       enddo
 
+      ! yxy begin
+      ncoremax=nint(sum(ncshells*nhsort)-
+     &   (sum(z*nhsort)-nelec+sum(z_dop*nhsort))/2)
+      ncoremax=ncoremax*nrel
+      ! yxy end
+
 c ------- Valence information --------------------------------------------
       maxel=0
       maxlfun=0

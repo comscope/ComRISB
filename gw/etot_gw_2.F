@@ -13,6 +13,9 @@ c -------- The OUTPUT of GW ENERGY -------------------------------------
       if(nproc_k/=1) then
 	  call DGOP(gx_vh_val,1,'  +',comm_pnt)
 	  call DGOP(ebnd_x,1,'  +',comm_pnt)
+      ! yxy begin
+      call DGOP(ebnd_val_x,1,'  +',comm_pnt)
+      ! yxy end
 	  call DGOP(gx_sx_val,1,'  +',comm_pnt)
 !         call DGOP(gx_vxc_val,1,'  +',comm_pnt) ! redundant
 	  call DGOP(e_magn,1,'  +',comm_pnt)
@@ -56,6 +59,14 @@ c -------- The OUTPUT of GW ENERGY -------------------------------------
      &      /'GX_SX_COR=',f15.8,' GX_SX_VAL=',f15.8,' GC_SX_VAL=',f15.8,
      &      /' GX_SC_VAL = ',f15.8,' GC_SC_VAL = ',f15.8,
      &      /' GX_SC_VAL_W=',f15.8,' GC_SC_VAL_W=',f15.8)
+      ! yxy begin
+      if(maswrk)then
+          write(*,'(" ebnd_valence_x-chem_pot*n_val(rydberg):",
+     &      f22.12)')ebnd_val_x-chem_pot*(nelec-ncoremax/nrel*2)
+          write(*,'(" total relevant valence electrons: ",f12.4)')
+     &      nelec-ncoremax/nrel*2
+      endif
+      ! yxy end
       mu_n=chem_pot*(sum(zcor)+nelec)
       mu_n_dft=chem_pot_lda*(sum(zcor)+nelec)
       t_kin_c=0.d0

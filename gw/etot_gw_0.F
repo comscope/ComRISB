@@ -6,6 +6,9 @@
 	d_free_c=0.d0
       ebnd_c=0.d0
       ebnd_x=0.d0
+      ! yxy begin 
+      ebnd_val_x=0.d0
+      ! yxy end
       gc_sc_val=0.d0
       gc_sc_val_w=0.d0
       gc_sx_val=0.d0

@@ -5,6 +5,7 @@
       use parallel_mod
       use solid_mod
       use lda_dmft_mod
+      use units_mod
       implicit none
       logical :: correlation
       integer :: iexit1
@@ -132,17 +133,14 @@ c	call write_gwl_bni
       enddo   !!! over iter
 
       ! yxy begin
-      ncoremax=nint(sum(ncshells*nhsort)-
-     &   (sum(z*nhsort)-nelec+sum(z_dop*nhsort))/2)
-      ncoremax=ncoremax*nrel
       eval1=maxval(e_bnd(ncoremax,:,:))
       eval2=maxval(e_bnd(ncoremax+1,:,:))
-      e_froz_min=((eval1+eval2)/2-chem_pot)*13.605691752d0
+      e_froz_min=((eval1+eval2)/2-chem_pot)*rydberg
       if(maswrk)then
         open(27,file="wannier_win.dat",status="replace")
         write(27,'(" e_froz_min(eV): ",f12.6," with gap: ",
      &    f12.6," cidx: ",i0)')
-     &    e_froz_min,(eval2-eval1)*13.605691752d0,ncoremax
+     &    e_froz_min,(eval2-eval1)*rydberg,ncoremax
         close(27)
       endif
       ! yxy end

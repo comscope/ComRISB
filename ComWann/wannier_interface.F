@@ -146,10 +146,10 @@ c     $    'the case of magn==2'
             jbnd=ibnd+ind_low
             if (ubi_num .ge. 4) then
               eigenvalues(ibnd,irk)=
-     $          (e_qp(jbnd,k0,ispin)-chem_pot)*evolt/2.0d0
+     $          (e_qp(jbnd,k0,ispin)-chem_pot)*rydberg
             else
               eigenvalues(ibnd,irk)=
-     $          (e_bnd(jbnd,k0,ispin)-chem_pot)*evolt/2.0d0
+     $          (e_bnd(jbnd,k0,ispin)-chem_pot)*rydberg
             endif
 
           enddo

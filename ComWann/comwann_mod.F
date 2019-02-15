@@ -85,7 +85,6 @@
      &  clight,
      &  chem_pot,
      &  chem_pot_qp,
-     &  evolt,
      &  gbas(3,3),
      &  par,
      &  pi,
@@ -148,7 +147,6 @@
       parameter (pi=3.141592653589793238d0)
       parameter (bohr=0.52917720859d0)
       parameter (rydberg=13.605691752d0)
-      parameter (evolt=27.2107d0)
 
       character*300 ::
      $ seed_name
