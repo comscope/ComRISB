@@ -21,4 +21,4 @@ clean_comwann:
 clean_wannier90:  	
 	cd wannier90_2.1 && $(MAKE) clean && cd ../
 clean_bin:
-	rm -f ./bin/*
+	rm -rf ./bin/*
