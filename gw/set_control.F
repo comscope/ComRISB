@@ -84,7 +84,10 @@ c -----------------------------------------------------------------
 	allocate(cor_norm(ncormax,nspin_0,nsort))
       allocate(iat_1(nsort))
       call flapw_1
-      maxplw=400000
+      ! yxy begin
+      ! maxplw=400000 
+      maxplw=800000
+      ! yxy eng
       nfgtl=5
       maxplwro=50000
       numvol=50
