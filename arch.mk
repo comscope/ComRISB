@@ -14,15 +14,6 @@ endif
 
 LAPACK_LIB = -mkl
 
-#### CTQMC ######################
-
-BASE_CPPFLAGS = -DNDEBUG
-BASE_LIBS = -lm
-
-CXX = CC
-CXX_MPI = CC -DHAVE_MPI
-CXXFLAGS = -std=c++11 -fexceptions -Wall -O3
-
 #### ComRISB ######################
 # will always use hdf5 internally, the interface, however, as of now, 
 # only works if the others are compiled without USE_HDF5.

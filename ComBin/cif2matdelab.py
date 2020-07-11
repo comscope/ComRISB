@@ -20,8 +20,6 @@ versionstr = '%(prog)s version 0.0\npymatgen version '+pymatgen.__version__
 # In this script we convert all quantities to Rydberg atomic units
 # (rather than Hartree atomic units).
 #
-rmt_reduce    = 0.97 # scale the muffin tin radius down to avoid overlaps
-
 chemical_name = {} # element name by atomic number
 chemical_symb = {} # chemical symbol by atomic number
 chemical_chrg = {} # nuclear charge by chemical symbol
@@ -1158,9 +1156,11 @@ def parse_arguments():
     prs = ArgumentParser()
     prs.add_argument("--version",action='version',
                      version=versionstr)
-    prs.add_argument("-m","--method",dest="method",help="The method to run, default is qp",
+    prs.add_argument("-m","--method",dest="method",
+                     help="The method to run, default is dft",
                      default="dft",choices=["dft","hf","gw","qp"])
-    prs.add_argument("--code",dest="code",help="The code suite to generate inputs for",
+    prs.add_argument("--code",dest="code",
+                     help="Code suite to generate inputs. Default for comsuite",
                      default="comsuite",choices=["comsuite","elk","wien2k"])
     prs.add_argument("--cell",dest="cell",help="The kind of unit cell to use",
                      default="primitive",choices=["primitive","conventional"])
@@ -1873,7 +1873,7 @@ def write_inifile(ini_struct,inifile):
                 error = "Strange chemical symbol:"+symbol
                 print(error)
             number = chemical_chrg[symbol]
-            smt    = element_rad[number]*rmt_reduce
+            smt    = element_rad[number]
             inifile.write("  txtel=%s   z=%5.1f magn_shift= 0.050\n" %
                           (symb2,float(number)))
             inifile.write("  smt=%8.5f h= 0.0120 nrad= 1216 z_dop=0.000\n" %
