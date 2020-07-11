@@ -1184,7 +1184,7 @@ def parse_arguments():
                      help="The temperature (K), the default is 300.0 K")
     prs.add_argument("ciffile",help="the ciffile of the input structure")
     prs.add_argument("--rmt",default=None,type=str,
-                     help="dict for mt sphere radius {1: 1.4, ...}")
+                     help="dict for mt sphere radius {58[Z]: 2.4, ...}")
     args = prs.parse_args()
     return args
 
