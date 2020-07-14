@@ -66,7 +66,7 @@ c     ---------------------------------------------------------------------
         if(ubi==' qp') we_need_pol=.true.
         if(ubi==' gw') we_need_pol=.true.
 
-	call set_g00
+      call set_g00
 c     ---------------------------------------------------------------------
         call smultro
         call vcoul
@@ -99,6 +99,9 @@ c     --------------------------------------------------------------------
         call writero
         iexit1=0
         if(ubi=='dft'.and.iter==iter_dft) iexit1=1
+      ! yxy begin
+        if(ubi=='dft'.and.lroconverge) iexit1=1
+      ! yxy end
         if(ubi==' hf'.and.iter==iter_dft+iter_hf) iexit1=1
         if(ubi==' gw'.and.iter==iter_dft+iter_hf+iter_gw) iexit1=1
         if(ubi==' qp'.and.iter==iter_dft+iter_hf+iter_gw
@@ -119,7 +122,7 @@ c
         call write_green_effhf_rst
         call write_restart_ubi_rst
 c        call write_wan_bni
-c	call write_gwl_bni
+c      call write_gwl_bni
 #ifdef USE_HDF5
        call write_gwl_bni_hdf5
        call write_wan_bni_hdf5
@@ -128,8 +131,11 @@ c	call write_gwl_bni
        call write_wan_bni
 #endif
 
-	  ubi_0=ubi
-	  iter=iter+1
+        ubi_0=ubi
+        iter=iter+1
+      ! yxy begin
+        if(iexit1 == 1)exit
+      ! yxy end
       enddo   !!! over iter
 
       ! yxy begin

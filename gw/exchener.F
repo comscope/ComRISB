@@ -5,35 +5,35 @@ c     key = 2 - for integral of E_xc*Ro
 *  Calculate exchange-correlation contribution to the   *
 *            total energy.                              *
 *********************************************************
-	use atom_mod
-	use etot_mod
-	use manager_mod
-	use solid_mod
-	use parallel_mod
+      use atom_mod
+      use etot_mod
+      use manager_mod
+      use solid_mod
+      use parallel_mod
       implicit none
 #ifdef MPI
       include 'mpif.h'
 #endif
-	integer, intent(in) :: key
-	real*8, intent(out) :: ex_en
+      integer, intent(in) :: key
+      real*8, intent(out) :: ex_en
       integer :: ishplw,isort,ispin,l,lm,m,isym,mt,irad,i,
-     &	         j,ia,ib,ic,ind
+     &               j,ia,ib,ic,ind
       real*8 :: exchint,exchmt,sum,b,dqdall,bxchmt,bxchint,sr,ddot,si
-	real*8, allocatable :: work1(:),v1(:),bv1(:)
-	complex*16, allocatable :: vintr1(:,:),bvintr1(:,:)
-	allocate(work1(0:maxnrad))
+      real*8, allocatable :: work1(:),v1(:),bv1(:)
+      complex*16, allocatable :: vintr1(:,:),bvintr1(:,:)
+      allocate(work1(0:maxnrad))
       ishplw=nplwro/nproc
       if(ishplw*nproc.lt.nplwro) ishplw=ishplw+1
 c  set up full potential to zero, then calculate exchange-correlation
-	allocate(v1(maxmt))
+      allocate(v1(maxmt))
       v1=0.d0
-	allocate(bv1(maxmtb))
-	bv1=0.d0
-	allocate(bvintr1(3,nplwro))
-	bvintr1=(0.d0,0.d0)
+      allocate(bv1(maxmtb))
+      bv1=0.d0
+      allocate(bvintr1(3,nplwro))
+      bvintr1=(0.d0,0.d0)
 c  calculate density of the exchange-correlation energy
       call vexch(key,v1,bv1)
-	allocate(vintr1(nplwro,nspin))
+      allocate(vintr1(nplwro,nspin))
       vintr1=(0.d0,0.d0)
       call vxint(key,vintr1,bvintr1)
 c   calculate mt-contribution to the exchange-correlation energy
@@ -108,7 +108,7 @@ c  calculate contribution from the interstitial region
      &                         *dr(irad,isort)*r(irad,isort)**2
                   enddo
                   bxchmt=bxchmt-dqdall(h(isort),work1,nrad(isort))
-     & 				           *nhsort(isort)
+     &                                    *nhsort(isort)
                 endif
               enddo   !!! over m
             enddo   !!! over l
@@ -151,5 +151,5 @@ c  calculate contribution from the interstitial region
 1010  format(1x,'(Full): exch-corr.energy : mt,int-parts are',
      &       2(1x,g17.10))
 1020  format(1x,'(B):exch-corr.energy : mt,int-parts are',2(1x,g17.10))
-	deallocate(work1,v1,vintr1,bv1,bvintr1)
+      deallocate(work1,v1,vintr1,bv1,bvintr1)
       end

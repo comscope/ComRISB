@@ -1,17 +1,17 @@
       subroutine rostart(rofi,roatom)
-	use atom_mod
-	use manager_mod
-	use solid_mod
-	use units_mod
+      use atom_mod
+      use manager_mod
+      use solid_mod
+      use units_mod
       implicit none
       real*8, intent(in) :: roatom(0:nrmax,nsort),rofi(0:nrmax,nsort)
-	integer :: isort,mt,mt1,nsitmax,isym,irad,istar
-	real*8 :: const,radius,zvtot,zsum,dqdall,charge_int
-	real*8, allocatable :: work(:)
-	allocate(work(0:maxnrad))
+      integer :: isort,mt,mt1,nsitmax,isym,irad,istar
+      real*8 :: const,radius,zvtot,zsum,dqdall,charge_int
+      real*8, allocatable :: work(:)
+      allocate(work(0:maxnrad))
         radius=10.d0
         nsitmax=2400
-	  ro=0.d0
+        ro=0.d0
         call mathpaw(nsitmax,radius,rofi,roatom)
         zvtot=0.d0
         zsum=0.d0
@@ -35,7 +35,7 @@
         call timel('******* matcor finished ************')
 c     The interstitial region &&&&&&&&&&&&&&&&&&&&&&&&&&&
         charge_int=zsum-zvtot
-	  rointr=(0.d0,0.d0)
+        rointr=(0.d0,0.d0)
         call PLWRHO(radius,rofi,roatom)
         rointr(1,1)=charge_int/amegaint
         if(nspin.eq.2) then
@@ -44,9 +44,9 @@ c     The interstitial region &&&&&&&&&&&&&&&&&&&&&&&&&&&
             rointr(istar,2)=rointr(istar,1)
           enddo
         endif
-	deallocate(work)
-	if(magn==2) then
-	  spmt=0.d0
-	  spintr=(0.d0,0.d0)
-	endif
+      deallocate(work)
+      if(magn==2) then
+        spmt=0.d0
+        spintr=(0.d0,0.d0)
+      endif
       end

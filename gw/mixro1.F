@@ -2,19 +2,19 @@
 *****************************************
 *   admixture in the main scf loop      *
 *****************************************
-	use atom_mod
-	use etot_mod
-	use manager_mod
-	use parallel_mod
-	use solid_mod
-	use units_mod
+      use atom_mod
+      use etot_mod
+      use manager_mod
+      use parallel_mod
+      use solid_mod
+      use units_mod
       implicit none
 #ifdef MPI
       include 'mpif.h'
 #endif
       integer :: isort,lm,isym,mt,mt1,irad,mti,mti1,i,l,m,istar,i_len
-	real*8 :: dz,dm,const,delrho,roout,roinp,ronew,spout,spinp,spnew,
-     &	        con,dqdall,ad
+      real*8 :: dz,dm,const,delrho,roout,roinp,ronew,spout,spinp,spnew,
+     &              con,dqdall,ad
       complex*16 :: rooutc,roinpc,ronewc,spoutc,spinpc,spnewc
       real*8, allocatable :: roold(:),work1(:),spmtold(:)
       complex*16, allocatable :: rointro(:,:),spinto(:,:)
@@ -22,34 +22,34 @@
       ad=admix
       if (ubi.ne.'dft') call set_adm(ad)
       allocate(rointro(nplwro,nspin),spinto(3,nplwro))
-	allocate(roold(maxmt),work1(0:maxnrad),spmtold(maxmtb))
+      allocate(roold(maxmt),work1(0:maxnrad),spmtold(maxmtb))
 c open file with the old charge density
       if(maswrk) then
-	  i_len=len_trim(allfile)
+        i_len=len_trim(allfile)
         open(3,file=allfile(1:i_len)//'_el_density',status='old',
      &       form='unformatted')
         read(3)roold
-	  read(3)rointro
+        read(3)rointro
       endif
-	if(goparr) then
+      if(goparr) then
 #ifdef MPI
         call brdcst(msgdbl,roold,8*maxmt,master,MPI_COMM_WORLD)
-	  call brdcst(msgdbl,rointro,16*nplwro*nspin,master,
-     &	            MPI_COMM_WORLD)
+        call brdcst(msgdbl,rointro,16*nplwro*nspin,master,
+     &                  MPI_COMM_WORLD)
 #endif     
-	endif
+      endif
       if(magn.eq.2) then
         if(maswrk) then
           read(3)spmtold
-	    read(3)spinto
+          read(3)spinto
         endif
-	  if(goparr) then
+        if(goparr) then
 #ifdef MPI
           call brdcst(msgdbl,spmtold,8*maxmtb,master,MPI_COMM_WORLD)
-	    call brdcst(msgdbl,spinto,48*nplwro,master,MPI_COMM_WORLD)
-#endif	    
-	  endif
-	endif
+          call brdcst(msgdbl,spinto,48*nplwro,master,MPI_COMM_WORLD)
+#endif          
+        endif
+      endif
       if(maswrk) close(3)
       dz=0.d0
       do isort=1,nsort
@@ -69,6 +69,12 @@ c define charge convergency between iterations
         write(iun,1010)dz
         print 1010,dz
       endif
+      ! yxy begin
+      ! need very stringent  
+      if(abs(dz) < 1.d-8)then
+        lroconverge = .true.
+      endif
+      ! yxy end
       dm=0.d0
       do isort=1,nsort
         do lm=1,(lmpb(isort)+1)**2
@@ -156,7 +162,12 @@ c admix new charge density with the old one
       if(maswrk) then
         if(magn.eq.2.or.nspin.eq.2)write(iun,1020)dm
         if(magn.eq.2.or.nspin.eq.2)print 1020,dm
-	endif
+      endif
+      ! yxy begin
+      if(lroconverge.and.(abs(dm) > 1.d-8))then
+        lroconverge = .false.
+      endif
+      ! yxy end
       deallocate(roold,work1,spmtold)
 1010  format(1x,'charge density self-consistency=',g14.7)
 1020  format(1x,'magnetization  self-consistency=',g14.7)
