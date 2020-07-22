@@ -71,7 +71,7 @@ c        We are good so nothing else to do here.
              enddo
            endif
            ! yxy begin
-           if(ubi == "dft")then
+           if(iter_gw == 0 .and. iter_qp == 0)then
                nproc_tau = tau_list(1)
            else
                nproc_tau = tau_list((1+nsol)/2)
