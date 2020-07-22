@@ -139,6 +139,11 @@ c     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
           smt(isort)=-smt(isort)
         endif
       enddo
+      ! yxy begin
+      if(maswrk)then
+        write(iun, '("updated smt:", 5f8.3)')smt
+      endif
+      ! yxy end
 c     &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
       do isort=1,nsort
          iz=idnint(z(isort))

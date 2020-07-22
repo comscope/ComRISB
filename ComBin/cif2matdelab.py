@@ -1183,8 +1183,14 @@ def parse_arguments():
     prs.add_argument('-T','--temperature',dest="temperature",default=300.0,type=float,
                      help="The temperature (K), the default is 300.0 K")
     prs.add_argument("ciffile",help="the ciffile of the input structure")
-    prs.add_argument("--rmt",default=None,type=str,
-                     help="dict for mt sphere radius {58[Z]: 2.4, ...}")
+    prs.add_argument("--rmt",
+            default=None,
+            type=str,
+            help="dict for mt sphere radius {58[Z]: 2.4, ...}")
+    prs.add_argument("--vv0",
+            default=1.0,
+            type=float,
+            help="volume ratio. default 1.0.")
     args = prs.parse_args()
     return args
 
@@ -1550,7 +1556,7 @@ def establish_r_grid(ini_struct):
     nrb   = 2*int(ceil(scale*Kmax/pi*b))
     nrc   = 2*int(ceil(scale*Kmax/pi*c))
     #
-    maxplw = 400000
+    maxplw = 800000
     l1     = 2*nra+8
     l2     = 2*nrb+8
     l3     = 2*nrc+8
@@ -2459,6 +2465,11 @@ def execute_with_arguments(args):
     cell    = str(args.cell)
     tmpfile = any2utf8(args.ciffile)
     struct  = cif2matdelab.structure(tmpfile,cell)
+    v0 = struct.struct.volume
+    print(f"vol from input cif: {v0:.2f} A^3, to be scaled by {args.vv0:.3f}.")
+    v1 = v0*args.vv0
+    struct.struct.scale_lattice(v1)
+    print(fr"scaled volume = {struct.struct.volume:.2f} A^3.")
     struct.struct.to(fmt="cif",filename="/tmp/"+os.path.basename(str(args.ciffile)))
     struct.prints()
     Kmax   = float(args.Kmax)

@@ -1,6 +1,8 @@
       subroutine goto_end(ifile)
-	integer :: i,ifile
-      do i=1,1000000
+      integer :: ifile
+      ! yxy begin
+      do 
+      ! yxy end
         read(ifile,*,end=1)
       enddo
 1     backspace ifile
