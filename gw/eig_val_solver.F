@@ -1,13 +1,13 @@
       subroutine eig_val_solver(n,n0,a,da)
       implicit none
-	integer, intent(in) :: n,n0
-	complex*16, intent(inout) :: a(n0,n0)
-	real*8, intent(out) :: da(n)
+      integer, intent(in) :: n,n0
+      complex*16, intent(inout) :: a(n0,n0)
+      real*8, intent(out) :: da(n)
       integer :: i,lwork,info,j,new
       real*8 :: vl,vu,abstol
       integer, allocatable :: iwork(:),ifail(:)
       real*8, allocatable :: rwork(:)
-	complex*16, allocatable :: z(:,:),work(:)
+      complex*16, allocatable :: z(:,:),work(:)
       allocate(z(n,n)) 
       abstol=1.d-70
       vl=-1.d10
@@ -21,5 +21,5 @@
           a(i,j)=z(i,j)
         enddo
       enddo
-	deallocate(work,rwork,iwork,ifail,z)
+      deallocate(work,rwork,iwork,ifail,z)
       end
