@@ -120,9 +120,13 @@ c
           enddo
         enddo
         close(3)
-        n_k = n_k - 1 ! The no. paths is one less than the no.
-                      ! of high symmetry points (every path 
-                      ! connects two consecutive points)
+!       yxy begin
+        if(n_k > 0)then
+          n_k = n_k - 1 ! The no. paths is one less than the no.
+                        ! of high symmetry points (every path 
+                        ! connects two consecutive points)
+        endif
+!       yxy end
       endif
 #ifdef MPI
       if (goparr) then

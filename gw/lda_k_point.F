@@ -72,8 +72,8 @@ c     &             ar1,ai1,br1,bi1,ispin,indg)
       allocate(ztmp(ndim,ndim))
 c -------- Spectrum of complex matrices ---------------------------
       if(me_tau_kk_pbr==0) call eig_val_gener_solver(eps_degen,ndim,
-     &                                                    ndim,a,b,nev,diag,
-     &                                               diagb)
+     &                          ndim,a,b,nev,diag,
+     &                          diagb)
       if(nproc_tau/=1) then
         call brdcst(msgdbl,a,16*ndim**2,0,comm_tau_kk_pbr)
         call brdcst(msgdbl,diag,8*ndim,0,comm_tau_kk_pbr)
@@ -167,7 +167,7 @@ c ------------------------------------------------------------------
           write(iun,*)'Band energies at k = ',1
           do ie=1,nbn
             write(iun,'(a17,i4,f18.13,3(1x,e12.5))')
-     &            'e d_val d_slp NRM',ie,ebn(ie),ac(1,ie),ac(2,ie),ac(3,ie)
+     &        'e d_val d_slp NRM',ie,ebn(ie),ac(1,ie),ac(2,ie),ac(3,ie)
           enddo   !!! over ie
         endif
       endif

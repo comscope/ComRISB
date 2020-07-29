@@ -1,14 +1,14 @@
       subroutine tos_lda(x,ttos,tdos)
-	use manager_mod
-	use parallel_mod
-	use solid_mod
+      use manager_mod
+      use parallel_mod
+      use solid_mod
       implicit none
-	integer :: ispin,k,ibnd,n
+      integer :: ispin,k,ibnd,n
       real*8 :: const,st,sd,ffd,fermi_dirac,x
       real*8 :: ttos ! sum of Fermi-Dirac occupation numbers
                      ! should equal total number of electrons
       real*8 :: tdos ! derivative of ttos wrt Fermi energy
-	const=2.d0/dfloat(nspin*nrel)
+      const=2.d0/dfloat(nspin*nrel)
       ttos=0.d0
       tdos=0.d0
       do ispin=1,nspin

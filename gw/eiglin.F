@@ -87,7 +87,7 @@ c     **************   The REAL  part *******************************
         ind=ind_y(1,iatom)
         ndimb2=2*ndimb
         call dgemm('t','n',nbas,ndimb2,ndimb2,1.d0,yr(ind,1),max_bs,
-     &                 pv(nt1,nt1,iatom,ispin),maxel,0.d0,zrl(1,ind),nbas)
+     &             pv(nt1,nt1,iatom,ispin),maxel,0.d0,zrl(1,ind),nbas)
         if(irel.eq.2) call dgemm('t','n',nbas,ndimb2,ndimb2,1.d0,
      &                               yi(ind,1),max_bs,
      &                           pvj(nt1,nt1,iatom),maxel,1.d0,
@@ -105,7 +105,7 @@ c     ********   The IMAGINE  part *******************************
         ind=ind_y(1,iatom)
         ndimb2=2*ndimb
         call dgemm('t','n',nbas,ndimb2,ndimb2,-1.d0,yi(ind,1),max_bs,
-     &                 pv(nt1,nt1,iatom,ispin),maxel,0.d0,zrl(1,ind),nbas)
+     &             pv(nt1,nt1,iatom,ispin),maxel,0.d0,zrl(1,ind),nbas)
         if(irel.eq.2) call dgemm('t','n',nbas,ndimb2,ndimb2,1.d0,
      &                               yr(ind,1),max_bs,
      &                           pvj(nt1,nt1,iatom),maxel,1.d0,
@@ -126,15 +126,15 @@ c     &&& Adding PW-LO NMT contributions &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
           ndib=2*ndimb
           ind=ind_y(1,iatom)
           call dgemm('t','n',nbas,nt,ndib,1.d0,yr(ind,1),max_bs,
-     &                     pv(nt1,1,iatom,ispin),maxel,1.d0,ar0(1,jbas),nbas)
+     &               pv(nt1,1,iatom,ispin),maxel,1.d0,ar0(1,jbas),nbas)
           call dgemm('t','n',nbas,nt,ndib,-1.d0,yi(ind,1),max_bs,
-     &                     pv(nt1,1,iatom,ispin),maxel,1.d0,ai0(1,jbas),nbas)
+     &               pv(nt1,1,iatom,ispin),maxel,1.d0,ai0(1,jbas),nbas)
           if(irel.eq.2) then
             call dgemm('t','n',nbas,nt,ndib,1.d0,yi(ind,1),max_bs,
-     &                        pvj(nt1,1,iatom),maxel,1.d0,ar0(1,jbas),
+     &                 pvj(nt1,1,iatom),maxel,1.d0,ar0(1,jbas),
      &                 nbas)
             call dgemm('t','n',nbas,nt,ndib,1.d0,yr(ind,1),max_bs,
-     &                       pvj(nt1,1,iatom),maxel,1.d0,ai0(1,jbas),nbas)
+     &                 pvj(nt1,1,iatom),maxel,1.d0,ai0(1,jbas),nbas)
           endif
           jbas=jbas+nt
         endif
