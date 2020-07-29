@@ -139,13 +139,14 @@ c      call write_gwl_bni
       enddo   !!! over iter
 
       ! yxy begin
-      eval1=maxval(e_bnd(ncoremax,:,:))
-      eval2=maxval(e_bnd(ncoremax+1,:,:))
+      eval1=maxval(e_bnd(ncoremax,:,:nspin))
+      eval2=maxval(e_bnd(ncoremax+1,:,:nspin))
       e_froz_min=((eval1+eval2)/2-chem_pot)*rydberg
       if(maswrk)then
+        write(iun, "('top semicore state: ', f12.5)")eval1
         open(27,file="wannier_win.dat",status="replace")
-        write(27,'(" e_froz_min(eV): ",f12.6," with gap: ",
-     &    f12.6," cidx: ",i0)')
+        write(27,'(" e_froz_min(eV): ",f12.3," with gap: ",
+     &    f12.3," cidx: ",i0)')
      &    e_froz_min,(eval2-eval1)*rydberg,ncoremax
         close(27)
       endif

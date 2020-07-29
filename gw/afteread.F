@@ -220,6 +220,7 @@ c
       enddo
 
       ! yxy begin
+      ! semicore states
       ncoremax=nint(sum(ncshells*nhsort)-
      &   (sum(z*nhsort)-nelec+sum(z_dop*nhsort))/2)
       ncoremax=ncoremax*nrel
