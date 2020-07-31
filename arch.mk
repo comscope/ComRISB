@@ -2,7 +2,7 @@
 
 
 #compfl = -debug -g -CB -check bounds -traceback -check uninit -fp-model precise
-compfl = -O3
+compfl = -O3 -traceback
 
 PF90 = mpiifort
 F90 = ifort

@@ -182,6 +182,11 @@ cDefault route: ['G','X']
 
       call read_kpath(mx_symb,mx_k,n_symb,num_k_path,s,v_symb,
      &                ind_symb)
+! yxy begin
+      if(num_k_path<=0)then
+        bandplot = .false.
+      endif
+! yxy end
 c -------------------------------------------------------------
       do i=1,n_symb
         r=v_symb(1,i)*gbas(:,1)+v_symb(2,i)*gbas(:,2)
