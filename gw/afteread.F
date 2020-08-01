@@ -221,8 +221,8 @@ c
 
       ! yxy begin
       ! semicore states
-      ncoremax=nint(sum(ncshells*nhsort)-
-     &   (sum(z*nhsort)-nelec+sum(z_dop*nhsort))/2)
+      ncoremax=nint(sum(ncshells*nhsort)-           ! core + semicore shells
+     &   (sum(z*nhsort)-nelec+sum(z_dop*nhsort))/2) ! core electrons
       ncoremax=ncoremax*nrel
       ! yxy end
 

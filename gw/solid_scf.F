@@ -140,7 +140,7 @@ c      call write_gwl_bni
 
       ! yxy begin
       eval1=maxval(e_bnd(ncoremax,:,:nspin))
-      eval2=maxval(e_bnd(ncoremax+1,:,:nspin))
+      eval2=minval(e_bnd(ncoremax+1,:,:nspin))
       e_froz_min=((eval1+eval2)/2-chem_pot)*rydberg
       if(maswrk)then
         write(iun, "('top semicore state: ', f12.5)")eval1
