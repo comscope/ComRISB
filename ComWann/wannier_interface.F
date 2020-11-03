@@ -323,16 +323,16 @@ c          write(179,*) 'num_bands should be even number if irel .eq. 2'
 
 
         if (maswrk) then
-          write(iun,*) "nntot",nntot
-          write(iun,*) "kvec and bvec in gbas"
-          do ind=1, nqdiv
-            do iq0=1, nntot
-              bvec=
-     $          kpt_latt(:,nnlist(ind,iq0))+nncell(:,ind,iq0)
-     $          -kpt_latt(:,ind)
-              write(iun,'(6f12.6)') kpt_latt(:,ind), bvec
-            enddo
-          enddo
+!          write(iun,*) "nntot",nntot
+!          write(iun,*) "kvec and bvec in gbas"
+!          do ind=1, nqdiv
+!            do iq0=1, nntot
+!              bvec=
+!     $          kpt_latt(:,nnlist(ind,iq0))+nncell(:,ind,iq0)
+!     $          -kpt_latt(:,ind)
+!              write(iun,'(6f12.6)') kpt_latt(:,ind), bvec
+!            enddo
+!          enddo
           write(iun,*) "num_bands",num_bands
           write(iun,*) "num_wann",num_wann
         endif
@@ -352,7 +352,7 @@ c          write(179,*) 'num_bands should be even number if irel .eq. 2'
         if (maswrk) then
            write(iun,*) 'num_wann', num_wann
            write(iun,*) 'num_bands', num_bands
-           write(iun,*) 'eigenvalues', eigenvalues
+           ! write(iun,*) 'eigenvalues', eigenvalues
           call wannier_run(trim(seed_name),ndiv,nqdiv,
      $      transpose(rbas)*par*bohr,transpose(gbas)*2.0d0*pi/par/bohr,
      $      kpt_latt,num_bands,num_wann,nntot,natom,atom_symbols,

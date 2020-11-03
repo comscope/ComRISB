@@ -1,6 +1,6 @@
       module atom_mod
-	integer :: limlb,
-     &	         limlb1,
+      integer :: limlb,
+     &               limlb1,
      &           limlpb,
      &           max_bs,
      &           max_e_pb,
@@ -41,12 +41,12 @@
      &           nwp2_full,
      &           nwpmax
       real*8 :: a_const_ci
-	character*1, allocatable :: correlated(:,:,:)
-	character*3, allocatable :: augm(:,:,:)
-	character*4, allocatable :: txtel(:)
-	integer, allocatable :: i_num(:),
-     & 	                      idmd(:,:,:),
-     &	                      ie_isz(:,:),
+      character*1, allocatable :: correlated(:,:,:)
+      character*3, allocatable :: augm(:,:,:)
+      character*4, allocatable :: txtel(:)
+      integer, allocatable :: i_num(:),
+     &                             idmd(:,:,:),
+     &                            ie_isz(:,:),
      &                        ie_val(:,:),
      &                        in_val(:,:),
      &                        ind_ci(:),
@@ -90,7 +90,7 @@
      &                        lm_isz(:,:),
      &                        lm_num(:),
      &                        lm_pbmt(:,:),
-     &	                      lmb(:),
+     &                            lmb(:),
      &                        lmpb(:),
      &                        lval_pb(:,:),
      &                        n_e_apw(:,:),
@@ -110,7 +110,7 @@
       real*8, allocatable :: augm_coef(:,:,:,:),
      &                       b_mt(:),
      &                       amass(:),
-     &	                     atoc(:,:,:),
+     &                           atoc(:,:,:),
      &                       cor_norm(:,:,:),
      &                       d_lll(:,:,:),
      &                       dbl_int(:,:,:,:,:),
@@ -185,7 +185,7 @@
      &                       r(:,:),
      &                       r_atom(:,:),
      &                       r_nre_core(:,:,:),
-     &	                     r_smooth(:),
+     &                           r_smooth(:),
      &                       rl(:,:,:),
      &                       rl_atom(:,:),
      &                       ro(:),
@@ -196,7 +196,7 @@
      &                       sigc_tau_atom_old(:,:,:,:,:,:),
      &                       sigx_at(:,:,:,:),
      &                       sigx_at_old(:,:,:,:),
-     &	                     smt(:),
+     &                           smt(:),
      &                       spmt(:),
      &                       t_m(:,:,:,:,:),
      &                       t_ro(:,:,:,:,:),
@@ -221,16 +221,16 @@
      &                       w4_nu_atom(:,:,:,:,:,:),
      &                       w4_tau_atom(:,:,:,:,:,:),
      &                       weight(:,:),
-     &	                     x_atom(:,:,:,:),
-     &	                     xq_atom(:,:,:,:),
-     &	                     z(:),
-     &	                     z_dop(:),
+     &                           x_atom(:,:,:,:),
+     &                           xq_atom(:,:,:,:),
+     &                           z(:),
+     &                           z_dop(:),
      &                       zcor(:)
-	complex*16, allocatable :: g_omega_atom(:,:,:,:,:),
-     &	                         gc_omega_atom(:,:,:,:,:),
-     &	                         gx_omega_atom(:,:,:,:),
+      complex*16, allocatable :: g_omega_atom(:,:,:,:,:),
+     &                               gc_omega_atom(:,:,:,:,:),
+     &                               gx_omega_atom(:,:,:,:),
      &                           orb_mom_real(:,:,:,:),
-     &	                         p_loc_tau(:,:,:,:),
+     &                               p_loc_tau(:,:,:,:),
      &                           sigc_omega_atom(:,:,:,:,:)
 ! yxy begin
         ! to help identify the valence bands

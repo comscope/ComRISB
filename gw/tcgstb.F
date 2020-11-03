@@ -17,7 +17,7 @@ C
       
       
       
-	subroutine group_incl(group_in,ndim,irank,group_out)
+      subroutine group_incl(group_in,ndim,irank,group_out)
 #ifdef MPI
       include 'mpif.h'
 #endif
@@ -33,11 +33,11 @@ C
       CALL MPI_Group_incl(group_in,ndim,irank,group_out,ierror)
 #endif      
       END
-	
-	
-	
-	
-	subroutine comm_create(group_in,comm_out)
+      
+      
+      
+      
+      subroutine comm_create(group_in,comm_out)
 #ifdef MPI
       include 'mpif.h'
 #endif
@@ -54,18 +54,18 @@ C
       CALL MPI_COMM_CREATE(MPI_COMM_WORLD,group_in,comm_out,IERROR)
 #endif      
       END
-	
-	
-	
-	
-	
-	subroutine cart_create(comm_in,ndims,dims,comm_cart)
+      
+      
+      
+      
+      
+      subroutine cart_create(comm_in,ndims,dims,comm_cart)
 #ifdef MPI
       include 'mpif.h'
 #endif
       integer, intent(in) :: comm_in,ndims,dims(ndims)
       integer, intent(out) :: comm_cart
-	logical periods(ndims),reorder(ndims)
+      logical periods(ndims),reorder(ndims)
 C
 C        Creates the cartesian communicator inside 
 !        the communicator comm_in
@@ -73,8 +73,8 @@ C
       comm_cart = 1
 C
 C
-	periods=.false.
-	reorder=.false.
+      periods=.false.
+      reorder=.false.
 #ifdef MPI
       CALL MPI_Cart_CREATE(comm_in,ndims,dims,periods,reorder,comm_cart,
      &                     IERROR)
@@ -84,12 +84,12 @@ C
       
       
       
-	subroutine cart_sub(comm_cart,remained_dims,comm_cart_new)
+      subroutine cart_sub(comm_cart,remained_dims,comm_cart_new)
 #ifdef MPI
       include 'mpif.h'
 #endif
       integer, intent(in) :: comm_cart
-	logical, intent(in) :: remained_dims(*)
+      logical, intent(in) :: remained_dims(*)
       integer, intent(out) :: comm_cart_new
 C
 C        Partitions communicator into subgroups with lower dimensions
@@ -105,18 +105,18 @@ C
       
       
       
-	subroutine cart_coords(comm_cart,rank_cart,ndims,coord1,coord2)
+      subroutine cart_coords(comm_cart,rank_cart,ndims,coord1,coord2)
 #ifdef MPI
       include 'mpif.h'
 #endif
       integer, intent(in) :: comm_cart,rank_cart,ndims
       integer, intent(out) :: coord1,coord2
-	integer :: coords(2)
+      integer :: coords(2)
 C
 C        Gives the cartesian coordinates of the process with RANK
 C
       coord1 = 1
-	coord2 = 1
+      coord2 = 1
 C
 C
 #ifdef MPI
@@ -129,7 +129,7 @@ C
       
       
       
-	subroutine comm_rank(comm_in,rank)
+      subroutine comm_rank(comm_in,rank)
 #ifdef MPI
       include 'mpif.h'
 #endif
@@ -149,7 +149,7 @@ C
       
       
       
-	subroutine cart_rank(comm_in,coord,rank)
+      subroutine cart_rank(comm_in,coord,rank)
 #ifdef MPI
       include 'mpif.h'
 #endif
@@ -169,8 +169,8 @@ C
       
       
       
-	
-	subroutine isend(buf,len,idest,comm)
+      
+      subroutine isend(buf,len,idest,comm)
 #ifdef MPI
       include 'mpif.h'
 #endif
@@ -179,11 +179,11 @@ C
       CALL MPI_SEND(BUF,LEN,MPI_INTEGER,idest,0,comm,IERROR)
 #endif      
       END
-	
-	
-	
-	
-	subroutine irecv(buf,len,ifrom,comm)
+      
+      
+      
+      
+      subroutine irecv(buf,len,ifrom,comm)
 #ifdef MPI
       include 'mpif.h'
 #endif
@@ -192,13 +192,13 @@ C
       CALL MPI_RECV(BUF,LEN,MPI_INTEGER,ifrom,0,comm,istatus,IERROR)
 #endif      
       END
-	
-	
-	
-	
-	
-	SUBROUTINE BRDCST(ITYPE,BUF,LENBUF,IFROM,comm)
-	integer :: comm,itype,lenbuf,ifrom
+      
+      
+      
+      
+      
+      SUBROUTINE BRDCST(ITYPE,BUF,LENBUF,IFROM,comm)
+      integer :: comm,itype,lenbuf,ifrom
       DOUBLE PRECISION BUF(*)
 #ifdef MPI
 C
@@ -238,33 +238,33 @@ C
       END IF
 #endif      
       END
-	
-	
-	
-	
-	
-	
-	
-	
-	SUBROUTINE BRDCSTc(BUF,LENBUF,IFROM,comm)
-	use parallel_mod
+      
+      
+      
+      
+      
+      
+      
+      
+      SUBROUTINE BRDCSTc(BUF,LENBUF,IFROM,comm)
+      use parallel_mod
 #ifdef MPI
       include 'mpif.h'
 #endif
-	integer :: comm,lenbuf,ifrom
+      integer :: comm,lenbuf,ifrom
       character*1 BUF(lenbuf)
 #ifdef MPI
-	integer, allocatable :: ich(:)
-	allocate(ich(lenbuf))
+      integer, allocatable :: ich(:)
+      allocate(ich(lenbuf))
 C
 C        BROADCAST -LENBUF- BYTES FROM -BUF- ON NODE -IFROM-
 C        TO ALL OTHERS NODES, SYNCHRONIZING ON MESSAGE RECEIPT.
 C
-	if(me==ifrom) ich=iachar(buf)
+      if(me==ifrom) ich=iachar(buf)
       CALL MPI_BCAST(ich,LENbuf,MPI_INTEGER,IFROM,comm,IERROR)
-	buf=achar(ich)
-	deallocate(ich)
-#endif	
+      buf=achar(ich)
+      deallocate(ich)
+#endif      
       END
       
       

@@ -3,7 +3,7 @@ include ../arch.mk
 
 comp = $(PF90) $(FPPFLAGS) -DMPI -c $(compfl)
 link = $(PF90)  $(compfl)
-LIB = -i-static $(LAPACK_LIB) 
+LIB = $(LAPACK_LIB) 
 
 PROG = rspflapw.exe
 

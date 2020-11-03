@@ -1,4 +1,4 @@
-# USE_HDF5 =true
+USE_HDF5 =true
 
 
 #compfl = -debug -g -CB -check bounds -traceback -check uninit -fp-model precise

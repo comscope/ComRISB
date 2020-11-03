@@ -4,8 +4,8 @@ c Adapted from Yu.A.Uspensky-s code
 c     key=0 for free ( or LDA) electrons
 c     key=1 for exchange only
 c     key=2 for full interaction
-	use manager_mod
-	use parallel_mod
+      use manager_mod
+      use parallel_mod
       implicit none
       logical left,right
       integer :: key,itmax,it
@@ -17,13 +17,13 @@ c
       f2(c,d)=2.d0/(c+sqrt(c*c+4.d0*(d-c)))
 c
 c               initiation
-	if(ubi=='dft') key=0
-	if(ubi==' hf') key=1
-	if(ubi==' gw') key=2
-	if(ubi=='gwg') key=2
-	h=0.2d0
-	eps=1.d-9
-	itmax=50
+      if(ubi=='dft') key=0
+      if(ubi==' hf') key=1
+      if(ubi==' gw') key=2
+      if(ubi=='gwg') key=2
+      h=0.2d0
+      eps=1.d-9
+      itmax=50
       it=1
       h1=1.d0/h
       x=x1
@@ -70,7 +70,7 @@ c       the parabola method.
       end if
       if(it.ge.itmax)then
        if(maswrk) write(iun,*)
-     &	        ' The exceeding of itmax in chem_pot_search'
+     &              ' The exceeding of itmax in chem_pot_search'
          goto 2
       endif
       if(abs(yy).le.eps) go to 2

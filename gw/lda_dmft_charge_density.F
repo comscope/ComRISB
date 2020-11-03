@@ -219,15 +219,6 @@ c$$$        write(iun,*) 'dmft_temperature', temperature
      $  mpi_double_complex,0,MPI_COMM_WORLD,mpierr)
 #endif
 #endif
-
-c$$$      write(179,*) 'band_index', dmft_bnd_index      
-      
-c$$$  allocate(is_dmft_bnd_included(nbndf))
-c$$$  is_dmft_bnd_included=0
-c$$$  do ii=1, n_dmft_bnd
-c$$$  is_dmft_bnd_included(dmft_bnd_index(ii))=1
-c$$$  enddo
-
       allocate(ev_bnd_dmft_0
      $  (nbasmpw,nbndf,ndim3_k(me3_k+1),nspin_0))
       ev_bnd_dmft_0=0.0d0
@@ -641,23 +632,23 @@ c     ----------------- Interstitial contribution ------------------------
 
       if (maswrk) then
 
-	 open(unit=992, file='coord.xsf')
-	 write(992,'(a)') "CRYSTAL"
-	 write(992,'(a)') "PRIMVEC"
-	 write(992,'(3(f12.7,3x))') (rbas(ii,1)*par*bohr, ii=1,3)
-	 write(992,'(3(f12.7,3x))') (rbas(ii,2)*par*bohr, ii=1,3)
-	 write(992,'(3(f12.7,3x))') (rbas(ii,3)*par*bohr, ii=1,3)
-	 write(992,'(a)') "CONVVEC"
-	 write(992,'(3(f12.7,3x))') (rbas(ii,1)*par*bohr, ii=1,3)
-	 write(992,'(3(f12.7,3x))') (rbas(ii,2)*par*bohr, ii=1,3)
-	 write(992,'(3(f12.7,3x))') (rbas(ii,3)*par*bohr, ii=1,3)
-	 write(992,'(a)') "PRIMCOORD"
-	 write(992,'(2(i5, 2x))') natom, 1
-	 do jj=1, natom
-	   write(992,'(i5, 2x, 3(f12.6,3x))') nint(z(is(jj))),
-     $      (tau(ii,jj)*par*bohr, ii=1,3)
-	 enddo        
-	 close(992)
-	 endif
+      open(unit=992, file='coord.xsf')
+      write(992,'(a)') "CRYSTAL"
+      write(992,'(a)') "PRIMVEC"
+      write(992,'(3(f12.7,3x))') (rbas(ii,1)*par*bohr, ii=1,3)
+      write(992,'(3(f12.7,3x))') (rbas(ii,2)*par*bohr, ii=1,3)
+      write(992,'(3(f12.7,3x))') (rbas(ii,3)*par*bohr, ii=1,3)
+      write(992,'(a)') "CONVVEC"
+      write(992,'(3(f12.7,3x))') (rbas(ii,1)*par*bohr, ii=1,3)
+      write(992,'(3(f12.7,3x))') (rbas(ii,2)*par*bohr, ii=1,3)
+      write(992,'(3(f12.7,3x))') (rbas(ii,3)*par*bohr, ii=1,3)
+      write(992,'(a)') "PRIMCOORD"
+      write(992,'(2(i5, 2x))') natom, 1
+      do jj=1, natom
+        write(992,'(i5, 2x, 3(f12.6,3x))') nint(z(is(jj))),
+     $     (tau(ii,jj)*par*bohr, ii=1,3)
+      enddo        
+      close(992)
+      endif
       end
 

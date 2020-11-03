@@ -112,7 +112,7 @@ c      if (maswrk) write(180,*)'e_bnd',e_bnd
      &           allfile(1:i_len)//'/ev_bnd/'//trim(ubi_0),fid_rst)
       if(maswrk) write(iun,*)
      & allfile(1:i_len)//'/ev_bnd/'//trim(ubi_0)
-      if(maswrk) write(iun,*)'ev_bnd',ev_bnd
+!      if(maswrk) write(iun,*)'ev_bnd',ev_bnd
 !      write(180,*)'ev_bnd',ev_bnd
 
       nv(3) = n_mpi_k(me+1)

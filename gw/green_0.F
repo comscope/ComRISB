@@ -9,6 +9,9 @@
 c$$$      character*1 :: intt
       integer :: k,ispin,len,k0,i,j
       real*8 :: de,green0
+
+      real*8 :: sum_e=0, sum_e2=0, sum_e3=0
+
       real*8 :: maxerror
       integer :: fail_ind,ibnd,jbnd,aa,bb,cc, intloc(2)
       complex*16, allocatable :: umat(:,:),proj_mat(:,:),
@@ -74,6 +77,7 @@ c$$$                enddo
      $            fail_ind, maxerror)
 c$$$  write(179,'(a,3i5,f20.12)') 'unitary_check max error',
 c$$$  $            ispin,k,k0,maxerror                
+
                 if (fail_ind .ne. 0) then
                   write(iun,*) 'unitary_check fail', maxerror
                   call ending
@@ -88,19 +92,7 @@ c$$$  $            ispin,k,k0,maxerror
                 do i=1,n_bnd(k0,ispin)
                   de=e_bnd(i,k0,ispin)-chem_pot
                   g_full_0(i,i,k,ispin)=-green0(de,tau_mesh(n_tau))
-c$$$                  if (maswrk) then
-c$$$                    write(iun,'(a,3x,i5, f12.6, 5x, 10000(2f12.6, 2x))')
-c$$$     $                intt, k0,de*13.605,g_full_0(i,i,k,ispin)
-c$$$                  endif
                 enddo
-
-c$$$                open(unit=189,file=trim(ch)//'rho'//intt//'_0.dat')
-c$$$
-c$$$                do i=1,n_bnd(k0,ispin)                
-c$$$                  write(189,'(10000(2f12.6,2x))')
-c$$$     $              (g_full_0(i,j,k,ispin),j=1,n_bnd(k0,ispin))
-c$$$                enddo
-c$$$                close(189)
 !     add rho_dmft
 
                 deltarhomat1=0.0d0
@@ -116,7 +108,7 @@ c$$$                close(189)
                     enddo
                   enddo
                 enddo
-                
+
                 tmp1=0.0d0
                 call zgemm('n','n',n_bnd(k0,ispin),n_dmft_wan(k0),
      $            n_dmft_wan(k0),(1.d0,0.d0),proj_mat,nbndf,
@@ -189,6 +181,18 @@ c$$$                endif
                 deallocate(deltarhomat1)
                 deallocate(deltarhomat2)                                
 
+                do bb=1,n_bnd(k0,ispin)
+                    sum_e = sum_e + g_full_0(bb,bb,k,ispin)*wgt(k)
+                    sum_e2 = sum_e2 + g_full_00(bb,k,ispin)*wgt(k)
+                enddo
+
+
+               ! write(0,*)n_dmft_wan(k0), k0, k
+               ! read(*,*)
+
+                do bb=1, n_dmft_wan(k0)           
+                    sum_e3 = sum_e3 + dmft_den_mat(bb,bb,k0)*wgt(k)
+                enddo
               endif
             else
               call ferm_unpack_tau(g_full_0(1,1,k,ispin),
@@ -199,6 +203,12 @@ c$$$                endif
           enddo                 !! over k
         enddo                   !! over ispin
       endif
+
+      
+      !write(0,*)sum_e, sum_e2, sum_e3
+      !stop
+
+
       if(nproc_tau/=1) then
         if(.not.correlation) then
           len=nbndf*maxval(ndim3_k)*nspin_0
