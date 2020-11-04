@@ -15,7 +15,7 @@
 !      call fwrite(MPI_COMM_WORLD,ubi,"ubi",fid_dat)
       call finit()
       write(iun,*)'fid_dat',fid_dat
-      call fopen('info.rst',fid_dat)
+      call fopen('info.rst',fid_dat,replace=.true.)
       write(iun,*)'fid_dat',fid_dat
 !      call h5fopen_f('hdf.test',H5F_ACC_RDWR_F,fid_dat,h5err)
 !     &                   access_prp = proplistid)
