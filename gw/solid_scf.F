@@ -37,7 +37,6 @@ c
         call read_wfn_effhf_rst
         call read_green_effhf_rst
         iter_restart = iter     ! if iter_restart == iter then
-
         if (is_lda_dmft) then
           call initialize_wan_density_matrix
         endif        

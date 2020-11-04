@@ -264,6 +264,10 @@ c
       character*3 ubi_l
       integer :: ng(7)
       integer :: nv(7)
+      ! yxy begin
+      ! temporary fix for reading error
+      complex(8),allocatable :: bnd_buf(:,:,:,:)
+      ! yxy end
       ubi_l=adjustl(ubi)
 
       i_len=len_trim(allfile)
@@ -459,21 +463,49 @@ c
       ng(2) = size(ev_bnd,2)
       ng(3) = npnt
       ng(4) = size(ev_bnd,4)
+
+! yxy begin
+! reading fails
+!      do ii = 1, ng(4)
+!        nv(4) = ii-1
+!        call fread(comm_k,ev_bnd(:,:,1:ndim3_k(me3_k+1),ii:ii),ng,nv,
+!     &             allfile(1:i_len)//'/ev_bnd/'//trim(ubi_l),fid_rst)
+!      enddo
+      allocate(bnd_buf(ng(1), ng(2), ng(3), 1))
+      nv(3) = 0  ! no shift, read all the array
       do ii = 1, ng(4)
         nv(4) = ii-1
-        call fread(comm_k,ev_bnd(:,:,1:ndim3_k(me3_k+1),ii:ii),ng,nv,
+        call fread(comm_k,bnd_buf,ng,nv,
      &             allfile(1:i_len)//'/ev_bnd/'//trim(ubi_l),fid_rst)
+        ev_bnd(:,:,1:ndim3_k(me3_k+1),ii:ii) = bnd_buf(:,:,
+     &         n3_mpi_k(me3_k+1)+1:n3_mpi_k(me3_k+1)+ndim3_k(me3_k+1),:)
       enddo
+      deallocate(bnd_buf)
+! yxy end
       nv(3) = n3_mpi_k(me3_k+1)
       ng(1) = size(z_bnd,1)
       ng(2) = size(z_bnd,2)
       ng(3) = npnt
       ng(4) = size(z_bnd,4)
+
+! yxy begin
+! reading fails
+!      do ii = 1, ng(4)
+!        nv(4) = ii-1
+!        call fread(comm_k,z_bnd(:,:,1:ndim3_k(me3_k+1),ii:ii),ng,nv,
+!     &             allfile(1:i_len)//'/z_bnd/'//trim(ubi_l),fid_rst)
+!      enddo
+      allocate(bnd_buf(ng(1), ng(2), ng(3), 1))
+      nv(3) = 0  ! no shift, read all the array
       do ii = 1, ng(4)
         nv(4) = ii-1
-        call fread(comm_k,z_bnd(:,:,1:ndim3_k(me3_k+1),ii:ii),ng,nv,
+        call fread(comm_k,bnd_buf,ng,nv,
      &             allfile(1:i_len)//'/z_bnd/'//trim(ubi_l),fid_rst)
+        z_bnd(:,:,1:ndim3_k(me3_k+1),ii:ii) = bnd_buf(:,:,
+     &        n3_mpi_k(me3_k+1)+1:n3_mpi_k(me3_k+1)+ndim3_k(me3_k+1),:)
       enddo
+      deallocate(bnd_buf)
+! yxy end
       if (ubi.ne.'dft') then
         nv(3) = n3_mpi_k(me3_k+1)
         ng(1) = size(v_h_bb,1)
@@ -1051,6 +1083,9 @@ c
       integer :: ng(6)
       integer :: nv(6)
       logical :: file_exists
+! yxy begin
+      real(8),allocatable :: buf(:,:,:)
+! yxy end
 c
       ubi_l=adjustl(ubi)
       i_len=len_trim(allfile)
@@ -1081,12 +1116,24 @@ c
         ng(1) = size(g_full_00,1)
         ng(2) = npnt
         ng(3) = size(g_full_00,3)
-        do ii = 1, ng(3)
-          nv(3) = ii-1
-          call fread(comm_k,g_full_00(:,1:ndim3_k(me3_k+1),ii:ii),ng,nv,
-     &               allfile(1:i_len)//'/g_full_00/'//trim(ubi_l),
-     &               fid_rst)
-        enddo
+! yxy begin
+!        do ii = 1, ng(3)
+!          nv(3) = ii-1
+!          call fread(comm_k,g_full_00(:,1:ndim3_k(me3_k+1),ii:ii),ng,nv,
+!     &               allfile(1:i_len)//'/g_full_00/'//trim(ubi_l),
+!     &               fid_rst)
+!        enddo
+      nv(2) = 0
+      allocate(buf(ng(1), ng(2), 1))
+      do ii = 1, ng(3)
+        nv(3) = ii-1
+        call fread(comm_k,buf,ng,nv,
+     &      allfile(1:i_len)//'/g_full_00/'//trim(ubi_l), fid_rst)
+        g_full_00(:,1:ndim3_k(me3_k+1),ii:ii) = buf(:,
+     &      n3_mpi_k(me3_k+1)+1:n3_mpi_k(me3_k+1)+ndim3_k(me3_k+1),:)
+      enddo
+      deallocate(buf)
+! yxy end
       endif
       if (ubi .eq. ' gw' .or. (ubi .eq. ' qp')) then
         nv    = 0
