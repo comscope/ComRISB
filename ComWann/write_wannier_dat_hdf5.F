@@ -23,7 +23,8 @@
 !      call fwrite(MPI_COMM_WORLD,ubi,"ubi",fid_dat)
       call finit()
 c      write(iun,*)'fid_dat',fid_dat
-      call fopen(adjustl(trim(seed_name))//'.dat',fid_dat)
+      call fopen(adjustl(trim(seed_name))//'.dat',fid_dat,
+     &           replace=.true.)
 c      write(iun,*)'fid_dat',fid_dat
 
       trbas=rbas*par*bohr

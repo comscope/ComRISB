@@ -245,12 +245,18 @@ c
 c       Open a file for access. If no files are open yet then we
 c       need to initialize HDF5 as well with a h5open_f call.
 c
-        subroutine fopen(filename,fileid)
+        subroutine fopen(filename,fileid,replace)
         use hdf5
         implicit none
         character*(*), intent(in) :: filename 
         integer(hid_t), intent(out) :: fileid
         logical :: file_exists
+        logical,optional :: replace
+        logical :: replace_mode=.false.
+
+        if(present(replace))then
+          replace_mode = replace
+        endif
         if (openfiles.eq.0) then
           ! create property list
           call h5pcreate_f(H5P_FILE_ACCESS_F,proplistid,h5err)
@@ -264,14 +270,14 @@ c
           endif
         endif
         inquire(file=filename,exist=file_exists)
-        if (file_exists) then
+        if (file_exists.and..not.replace_mode) then
           call h5fopen_f(filename,H5F_ACC_RDWR_F,fileid,h5err,
      &                   access_prp = proplistid)
           if (h5err.ne.0) then
             write(*,*)'ERROR: fopen: h5fopen_f failed',filename
           endif
         else
-          call h5fcreate_f(filename,H5F_ACC_EXCL_F,fileid,h5err,
+          call h5fcreate_f(filename,H5F_ACC_TRUNC_F,fileid,h5err,
      &                     access_prp = proplistid)
           if (h5err.ne.0) then
             write(*,*)'ERROR: fopen: h5fcreate_f failed',filename
