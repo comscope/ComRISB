@@ -1853,7 +1853,7 @@ def write_inifile(ini_struct,inifile):
     inifile.write("DOS   emindos=-15.000  emaxdos= 15.000   ndos=  800\n")
     inifile.write("      n_cont_frac=  30 e_small=2.e-02\n")
     inifile.write("      dos=%s           bandstructure=%s\n" % (dos,band))
-    inifile.write("K_POINT  ndiv= 10 10 10  metal=T n_k_div= 9 k_line=010\n")
+    inifile.write("K_POINT  ndiv= 10 10 10  metal=T n_k_div= 19 k_line=010\n")
     inifile.write("MULTI_SCF vv0=  1.00\n")
     inifile.write("MAGNET  b_extval=   0.000000 iter_h_ext=0000100\n")
     inifile.write("        b_ext=  0.000  0.000  1.000\n")
