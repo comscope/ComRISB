@@ -220,7 +220,6 @@ c     $    'the case of magn==2'
      $      proj_site,proj_l,proj_m,proj_radial,proj_z,
      $      proj_x,proj_zona,exclude_bands,proj_s,proj_s_qaxisx)
         endif
-
         call mpi_bcast(nntot,1,mpi_integer,0,mpi_comm_world,mpierr)
         call mpi_bcast(nnlist,nqdiv*num_nnmax,mpi_integer,0,
      $    mpi_comm_world,mpierr)

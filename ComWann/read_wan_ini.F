@@ -145,8 +145,12 @@ c$$$        cut_total=0.0d0
 
       implicit none
       integer, intent(in) :: ispin
-      integer :: ind(1),ik
+
+! yxy begin
+!      integer :: ind(1),ik
+      integer :: ik,ib,ind
       double precision, allocatable :: tempvec(:)
+! yxy end
 
       ind_low=10000
       ind_high=-10000          
@@ -157,13 +161,23 @@ c$$$        cut_total=0.0d0
         else
           tempvec=(e_bnd(:,ik,ispin)-chem_pot)*rydberg
         endif
-        ind=maxloc(tempvec,mask=tempvec .lt. dis_win_min)
-        if (ind(1) .lt. ind_low) then
-          ind_low=ind(1)
+        do ib=1,n_bnd(ik,ispin)
+            if(tempvec(ib)>dis_win_min)then
+                ind = ib-1
+                exit
+            endif
+        enddo
+        if (ind .lt. ind_low) then
+          ind_low=ind
         endif
-        ind=minloc(tempvec,mask=tempvec .gt. dis_win_max)
-        if (ind(1) .gt. ind_high) then
-          ind_high=ind(1)
+        do ib=ind+1,n_bnd(ik,ispin)
+            if(tempvec(ib)>dis_win_max)then
+                ind = ib-1
+                exit
+            endif
+        enddo
+        if (ind .gt. ind_high) then
+          ind_high=ind
         endif
         deallocate(tempvec)
       enddo
