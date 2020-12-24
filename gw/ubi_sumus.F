@@ -1,21 +1,21 @@
       subroutine ubi_sumus(it)
       use atom_mod
-	use manager_mod
-	use solid_mod
-	implicit none
-	integer, intent(in) :: it
-	integer :: i,n,isort,n1,icor
-	if(it<=iter_dft) then
-	  ubi='dft'
-	else if(it<=iter_dft+iter_hf) then
-	  ubi=' hf'
-	else if(it<=iter_dft+iter_hf+iter_gw) then
-	  ubi=' gw'
-	else if(it<=iter_dft+iter_hf+iter_gw+iter_qp) then
-	  ubi=' qp'
-	endif
+      use manager_mod
+      use solid_mod
+      implicit none
+      integer, intent(in) :: it
+      integer :: i,n,isort,n1,icor
+      if(it<=iter_dft) then
+        ubi='dft'
+      else if(it<=iter_dft+iter_hf) then
+        ubi=' hf'
+      else if(it<=iter_dft+iter_hf+iter_gw) then
+        ubi=' gw'
+      else if(it<=iter_dft+iter_hf+iter_gw+iter_qp) then
+        ubi=' qp'
+      endif
 c ---------------------------------------
-	if(iter_h_ext==0) return
+      if(iter_h_ext==0) return
       i=0
       if(ubi=='dft') then
         i=iter_h_ext/10000
@@ -48,7 +48,7 @@ c ---------------------------------------
           cor_norm(:,2,isort)=cor_norm(:,1,isort)
         enddo
         do isort=1,nsort
-	    do icor=1,ncor(isort)
+          do icor=1,ncor(isort)
             n=indcor(icor,1,isort)
             n1=indcor(icor,2,isort)
             pcor(n1:n1+nrad(isort))=pcor(n:n+nrad(isort))
