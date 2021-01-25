@@ -82,6 +82,7 @@ c     ---------------------------------------------------------------------
         else
           call gw_loop
         endif
+
 c     -------------------------------------------------------------------- 
         call exchener(2,exch_dft) !! for new Density
         correlation=.false.
@@ -99,7 +100,8 @@ c     --------------------------------------------------------------------
         iexit1=0
         if(ubi=='dft'.and.iter==iter_dft) iexit1=1
       ! yxy begin
-        if(ubi=='dft'.and.lroconverge) iexit1=1
+        if(ubi=='dft'.and.lroconverge
+     &    .and.iter_hf+iter_gw+iter_qp==0) iexit1=1
       ! yxy end
         if(ubi==' hf'.and.iter==iter_dft+iter_hf) iexit1=1
         if(ubi==' gw'.and.iter==iter_dft+iter_hf+iter_gw) iexit1=1
@@ -133,7 +135,7 @@ c      call write_gwl_bni
         ubi_0=ubi
         iter=iter+1
       ! yxy begin
-        if(iexit1 == 1)exit
+        if(iexit1==1.and.iter_hf+iter_gw+iter_qp==0)exit
       ! yxy end
       enddo   !!! over iter
 
