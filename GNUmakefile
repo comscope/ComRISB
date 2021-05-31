@@ -2,8 +2,13 @@ include arch.mk
 
 default: all
 
-all: com_wannier90 com_comgw com_comwann
+all: env com_wannier90 com_comgw com_comwann
 
+env:
+	mkdir -p bin
+	if grep -Fxq "COMRISB_BIN=" ~/.bashrc; then \
+		echo -e '\nexport COMRISB_BIN=${PWD}/bin' >> ~/.bashrc; \
+	fi
 com_wannier90:  	
 	cd wannier90_2.1 && $(MAKE) all && cd ../
 com_comgw:
