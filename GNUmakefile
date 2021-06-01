@@ -6,7 +6,7 @@ all: env com_wannier90 com_comgw com_comwann
 
 env:
 	mkdir -p bin
-	if grep -Fq "COMRISB_BIN=" ~/.bashrc; then \
+	if ! grep -Fq "COMRISB_BIN=" ~/.bashrc; then \
 		echo -e '\nexport COMRISB_BIN=${PWD}/bin' >> ~/.bashrc; \
 	fi
 com_wannier90:  	
