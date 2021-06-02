@@ -8,3 +8,5 @@ for instruction.
 
 * For tutorials, download from 
 https://github.com/yaoyongxin/comrisb_tutorial. 
+
+* To test the code, 

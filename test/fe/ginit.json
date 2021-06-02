@@ -1,0 +1,65 @@
+{
+    "struct": {
+        "symbols": [
+            "Fe"
+        ],
+        "cell": [
+            [
+                -1.4332499999999997,
+                1.43325,
+                1.43325
+            ],
+            [
+                1.4332499999999997,
+                -1.43325,
+                1.43325
+            ],
+            [
+                1.4332500000000001,
+                1.43325,
+                -1.4332499999999997
+            ]
+        ],
+        "scaled_positions": [
+            [
+                0.0,
+                0.0,
+                0.0
+            ]
+        ]
+    },
+    "gchoice": {
+        "unit": "eV",
+        "spin_order": 1,
+        "ispin": 1,
+        "orbital_polarization": 1,
+        "iso": 1,
+        "u_matrix_type": 1,
+        "dc_mode": 12,
+        "idx_equivalent_atoms": [
+            0
+        ],
+        "unique_cor_symbol_list": [
+            "Fe"
+        ],
+        "unique_u_list": [
+            0.0
+        ],
+        "unique_j_list": [
+            0.0
+        ],
+        "unique_fs_list": [
+            [
+                0.0,
+                0.0,
+                0.0,
+                0.0
+            ]
+        ],
+        "unique_cor_orb_list": [
+            "d"
+        ],
+        "unique_nelf_list": [],
+        "giembeddiag": -2
+    }
+}
