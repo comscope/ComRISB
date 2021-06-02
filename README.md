@@ -1,6 +1,6 @@
-# comrisb
+# ComRISB
 
-A subpackage of comsuite to perform DFT+G-RISB calculations.
+A subpackage of comsuite to perform DFT/LQSGW+GRISB calculations.
 
 * To install, please refer to
 https://comrisb-tutorial.readthedocs.io/en/latest/install.htmp
