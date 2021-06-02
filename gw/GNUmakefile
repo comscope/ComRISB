@@ -628,12 +628,10 @@ mod_files = \
  solid_mod.mod \
  units_mod.mod
 
-ifdef USE_HDF5
-  o_files += write_wan_bni_hdf5.F
-  o_files += write_gwl_bni_hdf5.F
-  o_files += hdf5io_mod.o
-  mod_files += hdf5io_mod.mod
-endif
+o_files += write_wan_bni_hdf5.F
+o_files += write_gwl_bni_hdf5.F
+o_files += hdf5io_mod.o
+mod_files += hdf5io_mod.mod
 
 all: $(PROG)
 

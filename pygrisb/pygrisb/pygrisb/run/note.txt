@@ -1,0 +1,19 @@
+modification of excitingmixing:
+    def setup(self, x, F, func):
+        GenericBroyden.setup(self, x, F, func)
+        self.beta = np.full((self.shape[0],), self.alpha, dtype=self.dtype)
+        # yxy begin
+        import os
+        if os.path.isfile("jacobian.dat"):
+            self.beta = np.loadtxt("jacobian.dat")
+        # yxy end
+
+    def _update(self, x, f, dx, df, dx_norm, df_norm):
+        incr = f*self.last_f > 0
+        self.beta[incr] += self.alpha
+        self.beta[~incr] = self.alpha
+        np.clip(self.beta, 0, self.alphamax, out=self.beta)
+        # yxy begin
+        np.savetxt("jacobian.dat", self.beta)
+        # yxy end
+

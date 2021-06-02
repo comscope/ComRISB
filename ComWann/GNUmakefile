@@ -55,13 +55,11 @@ getlimj.o \
 mod_files = \
  comwann_mod.mod
 
-ifdef USE_HDF5
-  o_files +=  read_wan_bni_hdf5.o
-  o_files +=  read_restart_file_hdf5.o
-  o_files +=  write_wannier_dat_hdf5.o
-  o_files +=  hdf5io_mod.o
-  mod_files += hdf5io_mod.mod
-endif	
+o_files +=  read_wan_bni_hdf5.o
+o_files +=  read_restart_file_hdf5.o
+o_files +=  write_wannier_dat_hdf5.o
+o_files +=  hdf5io_mod.o
+mod_files += hdf5io_mod.mod
 
 TARGET = ComWann
 
