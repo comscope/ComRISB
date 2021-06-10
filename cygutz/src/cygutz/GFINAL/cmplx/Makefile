@@ -1,4 +1,4 @@
-include ../../../Makefile.in
+include ../../../../Makefile.in
 
 # FFLAGS = -O0 -check bound -check pointer -check arg_temp_created \
 		-traceback

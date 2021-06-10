@@ -157,265 +157,265 @@
      $is_r0_pair,is_r_group,is_r_pnt,is_r_pnt_ind,is_shift,is_sovi,
      $is_sovr,is_sym_label,is_tau,is_tshift,is_tshift_r,is_u,is_uj,
      $is_wgt,is_igbs,is_iplf_bk
-      if(is_augm .eq. .true.) then
+      if(is_augm) then
        write(888)augm
        endif
-      if(is_dr .eq. .true.) then
+      if(is_dr) then
        write(888)dr
        endif
-      if(is_gfun .eq. .true.) then
+      if(is_gfun) then
        write(888)gfun
        endif
-      if(is_gfund .eq. .true.) then
+      if(is_gfund) then
        write(888)gfund
        endif
-      if(is_h .eq. .true.) then
+      if(is_h) then
        write(888)h
        endif
-      if(is_ind_wf .eq. .true.) then
+      if(is_ind_wf) then
        write(888)ind_wf
        endif
-      if(is_indbasa .eq. .true.) then
+      if(is_indbasa) then
        write(888)indbasa
        endif
-      if(is_indfun0 .eq. .true.) then
+      if(is_indfun0) then
        write(888)indfun0
        endif
-      if(is_io_lem .eq. .true.) then
+      if(is_io_lem) then
        write(888)io_lem
        endif
-      if(is_iob2 .eq. .true.) then
+      if(is_iob2) then
        write(888)iob2
        endif
-      if(is_iopb .eq. .true.) then
+      if(is_iopb) then
        write(888)iopb
        endif
-      if(is_lf_isz .eq. .true.) then
+      if(is_lf_isz) then
        write(888)lf_isz
        endif
-      if(is_lfun .eq. .true.) then
+      if(is_lfun) then
        write(888)lfun
        endif
-      if(is_lfun_pb .eq. .true.) then
+      if(is_lfun_pb) then
        write(888)lfun_pb
        endif
-      if(is_lfunm .eq. .true.) then
+      if(is_lfunm) then
        write(888)lfunm
        endif
-      if(is_li_val .eq. .true.) then
+      if(is_li_val) then
        write(888)li_val
        endif
-      if(is_lim_pb_mt .eq. .true.) then
+      if(is_lim_pb_mt) then
        write(888)lim_pb_mt
        endif
-      if(is_lm_isz .eq. .true.) then
+      if(is_lm_isz) then
        write(888)lm_isz
        endif
-      if(is_lmb .eq. .true.) then
+      if(is_lmb) then
        write(888)lmb
        endif
-      if(is_lmpb .eq. .true.) then
+      if(is_lmpb) then
        write(888)lmpb
        endif
-      if(is_n_pbmt0 .eq. .true.) then
+      if(is_n_pbmt0) then
        write(888)n_pbmt0
        endif
-      if(is_nrad .eq. .true.) then
+      if(is_nrad) then
        write(888)nrad
        endif
-      if(is_ntle .eq. .true.) then
+      if(is_ntle) then
        write(888)ntle
        endif
-      if(is_ntle_pb .eq. .true.) then
+      if(is_ntle_pb) then
        write(888)ntle_pb
        endif
-      if(is_r .eq. .true.) then
+      if(is_r) then
        write(888)r
        endif
-      if(is_r_atom .eq. .true.) then
+      if(is_r_atom) then
        write(888)r_atom
        endif
-      if(is_rl .eq. .true.) then
+      if(is_rl) then
        write(888)rl
        endif
-      if(is_smt .eq. .true.) then
+      if(is_smt) then
        write(888)smt
        endif
-      if(is_txtel .eq. .true.) then
+      if(is_txtel) then
        write(888)txtel
        endif
-      if(is_bett .eq. .true.) then
+      if(is_bett) then
        write(888)bett
        endif
-      if(is_et_sum_nu .eq. .true.) then
+      if(is_et_sum_nu) then
        write(888)et_sum_nu
        endif
-      if(is_ind_nu_int .eq. .true.) then
+      if(is_ind_nu_int) then
        write(888)ind_nu_int
        endif
-      if(is_indxcgr .eq. .true.) then
+      if(is_indxcgr) then
        write(888)indxcgr
        endif
-      if(is_tau_mesh .eq. .true.) then
+      if(is_tau_mesh) then
        write(888)tau_mesh
        endif
-      if(is_w_nu .eq. .true.) then
+      if(is_w_nu) then
        write(888)w_nu
        endif
-      if(is_w_nu_d .eq. .true.) then
+      if(is_w_nu_d) then
        write(888)w_nu_d
        endif
-      if(is_e_bnd .eq. .true.) then
+      if(is_e_bnd) then
        write(888)e_bnd
        endif
-      if(is_e_qp .eq. .true.) then
+      if(is_e_qp) then
        write(888)e_qp
        endif
-      if(is_g_sym_0 .eq. .true.) then
+      if(is_g_sym_0) then
        write(888)g_sym_0
        endif
-      if(is_gbs .eq. .true.) then
+      if(is_gbs) then
        write(888)gbs
        endif
-      if(is_gbs_sym .eq. .true.) then
+      if(is_gbs_sym) then
        write(888)gbs_sym
        endif
-      if(is_i_kref .eq. .true.) then
+      if(is_i_kref) then
        write(888)i_kref
        endif
-      if(is_ifia .eq. .true.) then
+      if(is_ifia) then
        write(888)ifia
        endif
-      if(is_ig_pair .eq. .true.) then
+      if(is_ig_pair) then
        write(888)ig_pair
        endif
-      if(is_ind_k_star_back .eq. .true.) then
+      if(is_ind_k_star_back) then
        write(888)ind_k_star_back
        endif
-      if(is_ind_r_star .eq. .true.) then
+      if(is_ind_r_star) then
        write(888)ind_r_star
        endif
-      if(is_ind_r_star_back .eq. .true.) then
+      if(is_ind_r_star_back) then
        write(888)ind_r_star_back
        endif
-      if(is_indgb .eq. .true.) then
+      if(is_indgb) then
        write(888)indgb
        endif
-      if(is_indplw .eq. .true.) then
+      if(is_indplw) then
        write(888)indplw
        endif
-      if(is_indpw_gw .eq. .true.) then
+      if(is_indpw_gw) then
        write(888)indpw_gw
        endif
-      if(is_indpw_r .eq. .true.) then
+      if(is_indpw_r) then
        write(888)indpw_r
        endif
-      if(is_ip .eq. .true.) then
+      if(is_ip) then
        write(888)ip
        endif
-      if(is_ip_k .eq. .true.) then
+      if(is_ip_k) then
        write(888)ip_k
        endif
-      if(is_ip_r .eq. .true.) then
+      if(is_ip_r) then
        write(888)ip_r
        endif
-      if(is_iplf_gk .eq. .true.) then
+      if(is_iplf_gk) then
        write(888)iplf_gk
        endif
-      if(is_ir_ref .eq. .true.) then
+      if(is_ir_ref) then
        write(888)ir_ref
        endif
-      if(is_is .eq. .true.) then
+      if(is_is) then
        write(888)is
        endif
-      if(is_itshift_r .eq. .true.) then
+      if(is_itshift_r) then
        write(888)itshift_r
        endif
-      if(is_k_group .eq. .true.) then
+      if(is_k_group) then
        write(888)k_group
        endif
-      if(is_k_star .eq. .true.) then
+      if(is_k_star) then
        write(888)k_star
        endif
-      if(is_k_sym_0 .eq. .true.) then
+      if(is_k_sym_0) then
        write(888)k_sym_0
        endif
-      if(is_list_sym_k .eq. .true.) then
+      if(is_list_sym_k) then
        write(888)list_sym_k
        endif
-      if(is_n_bnd .eq. .true.) then
+      if(is_n_bnd) then
        write(888)n_bnd
        endif
-      if(is_nbask .eq. .true.) then
+      if(is_nbask) then
        write(888)nbask
        endif
-      if(is_nhsort .eq. .true.) then
+      if(is_nhsort) then
        write(888)nhsort
        endif
-      if(is_nplw_r .eq. .true.) then
+      if(is_nplw_r) then
        write(888)nplw_r
        endif
-      if(is_nplwgw .eq. .true.) then
+      if(is_nplwgw) then
        write(888)nplwgw
        endif
-      if(is_nrr_red .eq. .true.) then
+      if(is_nrr_red) then
        write(888)nrr_red
        endif
-      if(is_num_r_star .eq. .true.) then
+      if(is_num_r_star) then
        write(888)num_r_star
        endif
-      if(is_num_sym_k .eq. .true.) then
+      if(is_num_sym_k) then
        write(888)num_sym_k
        endif
-      if(is_pnt .eq. .true.) then
+      if(is_pnt) then
        write(888)pnt
        endif
-      if(is_r0_pair .eq. .true.) then
+      if(is_r0_pair) then
        write(888)r0_pair
        endif
-      if(is_r_group .eq. .true.) then
+      if(is_r_group) then
        write(888)r_group
        endif
-      if(is_r_pnt .eq. .true.) then
+      if(is_r_pnt) then
        write(888)r_pnt
        endif
-      if(is_r_pnt_ind .eq. .true.) then
+      if(is_r_pnt_ind) then
        write(888)r_pnt_ind
        endif
-      if(is_shift .eq. .true.) then
+      if(is_shift) then
        write(888)shift
        endif
-      if(is_sovi .eq. .true.) then
+      if(is_sovi) then
        write(888)sovi
        endif
-      if(is_sovr .eq. .true.) then
+      if(is_sovr) then
        write(888)sovr
        endif
-      if(is_sym_label .eq. .true.) then
+      if(is_sym_label) then
        write(888)sym_label
        endif
-      if(is_tau .eq. .true.) then
+      if(is_tau) then
        write(888)tau
        endif
-      if(is_tshift .eq. .true.) then
+      if(is_tshift) then
        write(888)tshift
        endif
-      if(is_tshift_r .eq. .true.) then
+      if(is_tshift_r) then
        write(888)tshift_r
        endif
-      if(is_u .eq. .true.) then
+      if(is_u) then
        write(888)u
        endif
-      if(is_uj .eq. .true.) then
+      if(is_uj) then
        write(888)uj
        endif
-      if(is_wgt .eq. .true.) then
+      if(is_wgt) then
        write(888)wgt
        endif
-      if(is_igbs .eq. .true.) then
+      if(is_igbs) then
        write(888)igbs
        endif
-      if(is_iplf_bk .eq. .true.) then
+      if(is_iplf_bk) then
        write(888)iplf_bk
        endif
       endif
@@ -442,25 +442,25 @@
       if(maswrk) then
       write(888)is_cg,is_cgr,is_indxcg,is_jcg,is_jcgr,is_k_list,
      $is_ksym_in_npnt
-      if(is_cg .eq. .true.) then
+      if(is_cg) then
        write(888)cg
        endif
-      if(is_cgr .eq. .true.) then
+      if(is_cgr) then
        write(888)cgr
        endif
-      if(is_indxcg .eq. .true.) then
+      if(is_indxcg) then
        write(888)indxcg
        endif
-      if(is_jcg .eq. .true.) then
+      if(is_jcg) then
        write(888)jcg
        endif
-      if(is_jcgr .eq. .true.) then
+      if(is_jcgr) then
        write(888)jcgr
        endif
-      if(is_k_list .eq. .true.) then
+      if(is_k_list) then
        write(888)k_list
        endif
-      if(is_ksym_in_npnt .eq. .true.) then
+      if(is_ksym_in_npnt) then
        write(888)ksym_in_npnt
        endif
       endif
@@ -495,13 +495,13 @@
           elseif (k0 .lt. 10000) then
             write(k0_ch, '(i4)') k0
           endif
-      if(is_s_it_r0 .eq. .true.) then
+      if(is_s_it_r0) then
       open(3,file=allfile(1:i_len)//'_s_it_r0_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       write(3)s_it_r0(:,:,ind_k)
       close(3)
       endif
-      if(is_w_rs_mi .eq. .true.) then
+      if(is_w_rs_mi) then
       open(3,file=allfile(1:i_len)//'_w_rs_mi_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       write(3)w_rs_mi(:,:,ind_k)
@@ -522,7 +522,7 @@
           elseif (k0 .lt. 10000) then
             write(k0_ch, '(i4)') k0
           endif
-      if(is_ev_bnd .eq. .true.) then
+      if(is_ev_bnd) then
       open(3,file=allfile(1:i_len)//'_ev_bnd_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       do ispin=1, nspin_0
@@ -530,7 +530,7 @@
       enddo
       close(3)
       endif
-      if(is_q_qp .eq. .true.) then
+      if(is_q_qp) then
       open(3,file=allfile(1:i_len)//'_q_qp_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       do ispin=1, nspin_0
@@ -538,19 +538,19 @@
       enddo
       close(3)
       endif
-      if(is_v_ii .eq. .true.) then
+      if(is_v_ii) then
       open(3,file=allfile(1:i_len)//'_v_ii_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       write(3)v_ii(:,:,ind_k)
       close(3)
       endif
-      if(is_v_mm .eq. .true.) then
+      if(is_v_mm) then
       open(3,file=allfile(1:i_len)//'_v_mm_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       write(3)v_mm(:,:,ind_k)
       close(3)
       endif
-      if(is_z_bnd .eq. .true.) then
+      if(is_z_bnd) then
       open(3,file=allfile(1:i_len)//'_z_bnd_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       do ispin=1, nspin_0
@@ -558,7 +558,7 @@
       enddo
       close(3)
       endif
-      if(is_ev_qp .eq. .true.) then
+      if(is_ev_qp) then
       open(3,file=allfile(1:i_len)//'_ev_qp_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       do ispin=1, nspin_0
@@ -566,7 +566,7 @@
       enddo
       close(3)
       endif
-      if(is_z_qp .eq. .true.) then
+      if(is_z_qp) then
       open(3,file=allfile(1:i_len)//'_z_qp_'//trim(k0_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       do ispin=1, nspin_0
@@ -589,13 +589,13 @@
         elseif (i_tau .lt. 10000) then
           write(tau_ch, '(i4)') i_tau
         endif
-      if(is_ab_nu_from_tau .eq. .true.) then
+      if(is_ab_nu_from_tau) then
       open(3,file=allfile(1:i_len)//'_ab_nu_from_tau_'//trim(tau_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       write(3)ab_nu_from_tau(ind_tau,:,:)
       close(3)
       endif
-      if(is_tau_from_nu .eq. .true.) then
+      if(is_tau_from_nu) then
       open(3,file=allfile(1:i_len)//'_tau_from_nu_'//trim(tau_ch)
      $//'_'//trim(ubi)//'.uca',form='unformatted')
       write(3)tau_from_nu(:,ind_tau,:)

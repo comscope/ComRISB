@@ -8,7 +8,7 @@ from pygrisb.io.h5io import h5open
 
 def get_groot():
     path = os.environ.get('WIEN_GUTZ_ROOT',
-            os.environ.get('COMSUITE_BIN', "./"))
+            os.environ.get('COMRISB_BIN', "./"))
     return path
 
 
