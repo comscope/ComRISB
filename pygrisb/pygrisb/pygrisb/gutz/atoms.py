@@ -1,4 +1,4 @@
-import os, sys, h5py, itertools, spglib, pymatgen, glob, json
+import os, sys, h5py, itertools, spglib, glob, json
 import numpy as np
 import pygrisb.mbody.coulomb_matrix as c_matrix
 import pygrisb.math.matrix_basis as mb
@@ -497,8 +497,10 @@ class json_cor_structure(disk_cor_structure):
 
 
 def read_cif(cif_file):
-    struct = pymatgen.Structure.from_file(cif_file, primitive=True)
-    struct = pymatgen.symmetry.analyzer.SpacegroupAnalyzer( \
+    from pymatgen.core import Structure
+    struct = Structure.from_file(cif_file, primitive=True)
+    import pymatgen.symmetry as symmetry
+    struct = symmetry.analyzer.SpacegroupAnalyzer( \
             struct).get_primitive_standard_structure()
     from  pymatgen.io.ase import AseAtomsAdaptor
     material = AseAtomsAdaptor.get_atoms(struct)

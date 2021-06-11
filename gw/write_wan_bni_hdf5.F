@@ -219,20 +219,26 @@ c     ------- Reading the type of the functions for L <= L_b ------
       ng(1)=size(jcg,1)
       call fwrite(MPI_COMM_WORLD,jcg,ng(1),nv(1),"jcg",fid_dat)
 !       write(888)jcgr
-      ng(1)=size(jcgr,1)
-      call fwrite(MPI_COMM_WORLD,jcgr,ng(1),nv(1),"jcgr",fid_dat)
+      if(allocated(jcgr))then
+          ng(1)=size(jcgr,1)
+          call fwrite(MPI_COMM_WORLD,jcgr,ng(1),nv(1),"jcgr",fid_dat)
+      endif
 !       write(888)indxcg
       ng(1)=size(indxcg,1)
       call fwrite(MPI_COMM_WORLD,indxcg,ng(1),nv(1),"indxcg",fid_dat)
 !       write(888)indxcgr
-      ng(1)=size(indxcgr,1)
-      ng(2)=size(indxcgr,2)
-      ng(3)=size(indxcgr,3)
-      ng(4)=size(indxcgr,4)
-      call fwrite(MPI_COMM_WORLD,indxcgr,ng,nv,"indxcgr",fid_dat)
+      if(allocated(indxcgr))then
+          ng(1)=size(indxcgr,1)
+          ng(2)=size(indxcgr,2)
+          ng(3)=size(indxcgr,3)
+          ng(4)=size(indxcgr,4)
+          call fwrite(MPI_COMM_WORLD,indxcgr,ng,nv,"indxcgr",fid_dat)
+      endif
 !       write(888)cgr
-      ng(1)=size(cgr,1)
-      call fwrite(MPI_COMM_WORLD,cgr,ng(1),nv(1),"cgr",fid_dat)       
+      if(allocated(cgr))then
+          ng(1)=size(cgr,1)
+          call fwrite(MPI_COMM_WORLD,cgr,ng(1),nv(1),"cgr",fid_dat)       
+      endif
 !       write(888)gbs
       ng(1)=size(gbs,1)
       ng(2)=size(gbs,2)
