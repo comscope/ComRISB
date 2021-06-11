@@ -19,21 +19,21 @@ obj = GPREC.o \
 	  GKERNEL.o 
 
 
-LIB = ../../lib/libprimme.a
-INCLUDE=-I../../include
+LIB = ../../../lib/libprimme.a
+INCLUDE=-I../../../include
 
 all: ${obj} GFINAL.o
 	${PF90} -cpp ${Fmpi_define} ${FFLAGS} -o CyGFinal GFINAL.o \
 		${obj} ${MKL_LIB} ${LIB}
 
-GPRIMME.o: ../GPRIMME.f90
+GPRIMME.o: ../../GPRIMME.f90
 	${F90} ${FIX_FORM} ${FFLAGS} -cpp -c $< $(INCLUDE)
 
-%.o: ./%.f90
+%.o: ../%.f90
 	${PF90} ${FREE_FORM} ${FFLAGS} -cpp ${Fmpi_define} \
             -c $< $(INCLUDE)
 
-%.o: ../%.f90
+%.o: ../../%.f90
 	${PF90} ${FREE_FORM} ${FFLAGS} -cpp ${Fmpi_define} ${Fstd_define} \
 			-c $< $(INCLUDE)
 
