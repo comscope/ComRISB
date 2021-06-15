@@ -214,6 +214,8 @@ def create_comwann_ini(control, wan_hmat):
         # can be specified in comrisb.ini.
         if wan_hmat['froz_win_min'] is None:
             wan_hmat['froz_win_min'] = -10
+        if 'dis_win_min' not in wan_hmat:
+            wan_hmat['dis_win_min'] = wan_hmat['froz_win_min'] - 40
     else:
         if eh <= el:
             raise ValueError("no gap between core and valence states.")
