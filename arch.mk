@@ -1,1 +1,1 @@
-arch.mk.intel
+arch.mk.gnu
