@@ -12,7 +12,8 @@ from math    import ceil, floor, acos, sqrt
 import cif2matdelab.structure
 import pymatgen
 
-versionstr = '%(prog)s version 0.0\npymatgen version '+pymatgen.__version__
+from pymatgen.core import __version__ as v
+versionstr = '%(prog)s version 0.0\npymatgen version '+v
 
 #
 # Note on units:

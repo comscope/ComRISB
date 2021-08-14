@@ -12,10 +12,9 @@ Dependencies:
 """
 import array
 import numpy
-import pymatgen as mg
 import math
-
-#print mg.__version__
+import pymatgen.symmetry as symmetry
+from pymatgen.core import Structure
 
 #
 # Angstrom to Bohr conversion factor
@@ -89,20 +88,20 @@ class structure:
         structure to create an instance whose from_file method we can invoke.
         """
         if   cellkind == "primitive":
-            self.struct = mg.Structure.from_file(ciffilename,primitive=True)
+            self.struct = Structure.from_file(ciffilename,primitive=True)
         elif cellkind == "conventional":
-            self.struct = mg.Structure.from_file(ciffilename,primitive=False)
+            self.struct = Structure.from_file(ciffilename,primitive=False)
         else:
             print("Unknown cellkind: %s" % cellkind)
             print("Valid options are \"primitive\" or \"conventional\"")
         #if self.struct.num_sites > 1:
         #  self.struct.merge_sites(mode="delete") # remove any duplicate atoms
-        self.sga    = mg.symmetry.analyzer.SpacegroupAnalyzer(self.struct)
+        self.sga    = symmetry.analyzer.SpacegroupAnalyzer(self.struct)
         self.struct = self.sga.get_refined_structure()
         if cellkind == "primitive":
-            self.struct = mg.symmetry.analyzer.SpacegroupAnalyzer(self.struct).find_primitive()
-        self.sga    = mg.symmetry.analyzer.SpacegroupAnalyzer(self.struct)
-        self.kpath  = mg.symmetry.bandstructure.HighSymmKpath(self.struct)
+            self.struct = symmetry.analyzer.SpacegroupAnalyzer(self.struct).find_primitive()
+        self.sga    = symmetry.analyzer.SpacegroupAnalyzer(self.struct)
+        self.kpath  = symmetry.bandstructure.HighSymmKpath(self.struct)
         self.kpath._kpath = map_to_conventional_cell(self.kpath._kpath)
 
     def lattice(self):
