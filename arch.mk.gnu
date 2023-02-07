@@ -1,3 +1,6 @@
+# Quantum Mobile v21.06.04
+# https://quantum-mobile.readthedocs.io/en/latest/releases/index.html
+
 compfl = -O2 -w -fbacktrace -ffree-line-length-0
 
 PF90 = h5pfc

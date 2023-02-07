@@ -280,11 +280,17 @@ c      write(179,*)'bk-readini_end3'
       allocate(bett((maxylm+1)**2))
       allocate(cg(cg_size))
       allocate(jcg(jcg_size))
-      allocate(jcgr(jcgr_size))
+      if(jcgr_size>0)then
+          allocate(jcgr(jcgr_size))
+      endif
       allocate(indxcg(indxcg_size))
-      allocate(indxcgr(indxcgr_r1size,indxcgr_r2size,
-     $   indxcgr_r3size,0:indxcgr_r4size-1))
-      allocate(cgr(cgr_size))
+      if(indxcgr_r1size>0)then
+          allocate(indxcgr(indxcgr_r1size,indxcgr_r2size,
+     $        indxcgr_r3size,0:indxcgr_r4size-1))
+      endif
+      if(cgr_size>0)then
+          allocate(cgr(cgr_size))
+      endif
       allocate(gbs(3,maxplw))
       allocate(gbs_sym(nplwdif,ngroup))
       allocate(i_kref(nqdiv))
@@ -405,8 +411,10 @@ c      write(179,*)'bk-readini_end2'
 !         write(993,'(a,f20.10)')'jcg',jcg(ii)
        enddo
 !       read(1)jcgr
-      ng(1)=size(jcgr,1)
-      call fread(MPI_COMM_WORLD,jcgr,ng(1),nv(1),"jcgr",fid_dat)
+      if(allocated(jcgr))then
+          ng(1)=size(jcgr,1)
+          call fread(MPI_COMM_WORLD,jcgr,ng(1),nv(1),"jcgr",fid_dat)
+      endif
        do ii=1,jcgr_size
 !         write(993,'(a,f20.10)')'jcgr',jcgr(ii)
        enddo
@@ -417,26 +425,30 @@ c      write(179,*)'bk-readini_end2'
 !         write(993,'(a,f20.10)')'indxcg',indxcg(ii)
        enddo
 !       read(1)indxcgr
-      ng(1)=size(indxcgr,1)
-      ng(2)=size(indxcgr,2)
-      ng(3)=size(indxcgr,3)
-      ng(4)=size(indxcgr,4)
-      call fread(MPI_COMM_WORLD,indxcgr,ng,nv,"indxcgr",fid_dat)
-       do ii=1,indxcgr_r1size
-        do jj=1,indxcgr_r2size
-         do kk=1,indxcgr_r3size
-          do ll=1,indxcgr_r4size
-!            write(993,'(a,f20.10)')'indxcgr',indxcgr(ii,jj,kk,ll)
-          enddo
-         enddo
-        enddo
-       enddo
+      if(allocated(indxcgr))then
+          ng(1)=size(indxcgr,1)
+          ng(2)=size(indxcgr,2)
+          ng(3)=size(indxcgr,3)
+          ng(4)=size(indxcgr,4)
+          call fread(MPI_COMM_WORLD,indxcgr,ng,nv,"indxcgr",fid_dat)
+           do ii=1,indxcgr_r1size
+            do jj=1,indxcgr_r2size
+             do kk=1,indxcgr_r3size
+              do ll=1,indxcgr_r4size
+!                write(993,'(a,f20.10)')'indxcgr',indxcgr(ii,jj,kk,ll)
+              enddo
+             enddo
+            enddo
+           enddo
+      endif
 !       read(1)cgr
-      ng(1)=size(cgr,1)
-      call fread(MPI_COMM_WORLD,cgr,ng(1),nv(1),"cgr",fid_dat)
-       do ii=1,cgr_size
-!         write(993,*)'cgr',cgr
-       enddo
+      if(allocated(cgr))then
+          ng(1)=size(cgr,1)
+          call fread(MPI_COMM_WORLD,cgr,ng(1),nv(1),"cgr",fid_dat)
+           do ii=1,cgr_size
+!             write(993,*)'cgr',cgr
+           enddo
+      endif
 
 !       read(1)gbs
       ng(1)=size(gbs,1)

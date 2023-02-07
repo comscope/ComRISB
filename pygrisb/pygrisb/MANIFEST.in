@@ -1,0 +1,4 @@
+include LICENSE README.md
+exclude pygrisb/gsolver/gs_ml.py pygrisb/ref_data
+ecursive-include pygrisb *.py 
+recursive-exclude pygrisb test/*.*
