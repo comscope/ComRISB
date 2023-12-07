@@ -3,7 +3,18 @@ from pygrisb.run.timing import timeit
 import warnings
 warnings.filterwarnings("ignore")
 
-
+# driver calls one of the following methods:
+# iembeddiag == -10: gs_ml.gs_h5ml_fsoc_krr(imp=imp, jac=jac) -> kernel ridge machine learning
+# iembeddiag == -11: gs_ml.gs_h5ml_fsoc_nm1d(nval=nval, imp=imp, jac=jac) -> machine learning with normal-mode expansion at 1st order for multivariate interpolation
+# iembeddiag == -13: gs_ml.gs_h5ml_fsoc_nm2d(nval=nval, imp=imp, jac=jac) -> machine learning with normal-mode expansion at 2nd order for multivariate interpolation
+# iembeddiag == -14: gs_ml.gs_h5ml_fsoc_nm3d(nval=nval, imp=imp, jac=jac) -> machine learning with normal-mode expansion at 3rd order for multivariate interpolation
+# iembeddiag in [-1, -2, -3, -4, -201]: runs exe_spci{cygtail.lower()} with some arguments
+# iembeddiag == 1: gsolver_h5trans_ed(imp=imp, mpiexec=mpiexec, path=path, nval_bot=nval_bot, nval_top=nval_top) 
+#       -> runs exe_ed, parallel exact diagonalization solver with hamiltonian transformed
+#           into complex spherical hamrmonics basis with spin-faster index.
+# iembeddiag == 101: gsolver_h5ed(imp=imp, mpiexec=mpiexec, path=path, nval_bot=nval_bot, nval_top=nval_top)
+#       -> runs exe_ed, parallel exact diagonalization solver
+# iembeddiag == 50: gsolver_vhs(imp=imp,]read_v2e=True,) -> I can't find the source code.
 @timeit
 def driver(
         imp=0,

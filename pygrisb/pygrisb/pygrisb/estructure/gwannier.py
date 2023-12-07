@@ -7,7 +7,9 @@ import itertools as it
 from pygrisb.iface.wanniertb import w90
 from pygrisb.mpi.mpi import get_myk_range as get_myk_range
 
-
+# get_csh2sab returns a list which contains the transformation from the 
+#   complex spherical harmonics basis to the g-risb symmetry adapted basis.
+#   The matrix is in in GParam.h5/dbs2sab and GParam.h5/imap_list.
 def get_csh2sab():
     '''get transformation from complex spherical harmonics basis to
     g-risb symmetry adapted basis.
@@ -23,27 +25,59 @@ def get_csh2sab():
                 csh2sab_list.append(csh2sab_list[imap])
     return csh2sab_list
 
-
+# get_wan2sab returns the transformation from wannier basis to cygutz symmetry adapted basis.
+# This is multiple of two matrices, W H.
+#   W = u_wan2csh  is a  matrix that sorts orbitals into first wannier orbitals and then non-wannier orbitals.
+#       In the wannier portion of u_wan2csh, info is included about the basis
+#       transformation from real spherical harmonics to complex spherical harmonics.  
+#       This matrix is in GBareH.h5.
+# H = csh2sab_list contains the transformation from the 
+#   complex spherical harmonics basis to the g-risb symmetry adapted basis.
+#   The matrix is in in GParam.h5/dbs2sab and GParam.h5/imap_list.  
 def get_wan2sab():
     '''get transformation from wannier basis to cygutz symmetry adapted basis.
     '''
+    
+    # get_csh2sab returns a list which contains the transformation from the 
+    #   complex spherical harmonics basis to the g-risb symmetry adapted basis.
+    #   The matrix is in in GParam.h5/dbs2sab and GParam.h5/imap_list.   
     csh2sab_list = get_csh2sab()
+
+    # 'u_wan2csh' = u_wan2csh  is a  matrix that sorts orbitals into first wannier orbitals and then non-wannier orbitals.
+    #       In the wannier portion of u_wan2csh, info is included about the basis
+    #       transformation from real spherical harmonics to complex spherical harmonics.    
     with h5py.File("GBareH.h5", "r") as f:
         wan2csh = f["/"].attrs["u_wan2csh"]
+        
     with h5py.File("GParam.h5", "r") as f:
-        iso = f["/"].attrs["iso"]
+        iso = f["/"].attrs["iso"] # if spin-orbit then iso=2, otherwise iso=1
 
     csh2sab = []
     for u1 in csh2sab_list:
         n1 = u1.shape[0]//(3-iso)
         csh2sab.append(u1[:n1, ::3-iso])
+    
+    # sort csh2sab into block-diagonal form    
     csh2sab = block_diag(*csh2sab)
+    
     wan2sab = wan2csh.copy()
     n1 = csh2sab.shape[0]
+    
     wan2sab[:,:n1] = wan2csh[:,:n1].dot(csh2sab)
     return wan2sab
 
+r_list,
+            lambda_list, nr_list, nphy_list, h1e_list
 
+# get_gloc_in_wannier_basis returns five matrices from GLog.h5:
+#   "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian
+#   "RMAT" = quasiparticle renormalization matrix
+#   "NRLMAT" = local density part to be subtracted in density calculations
+#   "NPHYMAT" = physical density matrix to be added in density calculations
+#   "H1E" = h1e for band structure calculations
+#  All of these matrices are transformed from the cygutz symmetry adapted basis
+#       to the wannier basis, using information pulled from GBareH.h5 and GParam.h5.
+# Also if some matrices are too small they may be padded with ones on the diagonal.
 def get_gloc_in_wannier_basis():
     '''get the gutzwiller local matrices, including r, lambda, nr, and nphy,
     h1e, from grisb calculation.
@@ -65,7 +99,18 @@ def get_gloc_in_wannier_basis():
             h1e_list = numpy.concatenate((h1e_list, h1e_list))
 
     # get transformation from wannier basis to cygutz symmetry adapted basis.
+    # get_wan2sab returns the transformation from wannier basis to cygutz symmetry adapted basis.
+    # This is multiple of two matrices, W H.
+    #   W = u_wan2csh  is a  matrix that sorts orbitals into first wannier orbitals and then non-wannier orbitals.
+    #       In the wannier portion of u_wan2csh, info is included about the basis
+    #       transformation from real spherical harmonics to complex spherical harmonics.  
+    #       This matrix is in GBareH.h5.
+    # H = csh2sab_list contains the transformation from the 
+    #   complex spherical harmonics basis to the g-risb symmetry adapted basis.
+    #   The matrix is in in GParam.h5/dbs2sab and GParam.h5/imap_list.      
     wan2sab = get_wan2sab()
+  
+    
     # convert to wannier basis in each spin block.
     lam2 = []
     r2 = []
@@ -102,8 +147,27 @@ def get_structure():
             species=data["struct"]["symbols"],
             coords=data["struct"]["scaled_positions"],
             )
-
-
+    
+# get_bands returns the eigenvalues and eigenvectors of hmat, the Gutzwiller
+#   hamiltonian. The eigenvalues first have the Fermi level (from GLog.h5) subtracted from them.      
+# hmat = R (W^\dagger E W - H1) R^T - Lambda
+#   W = wfwannier_list is a list of overlap between band wavefunctions and 
+#           wannier orbitals.
+#   E = bnd_es_in is a list of band energies.
+#   R = "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian, from GLog.h5
+#   Lambda=  "RMAT" = quasiparticle renormalization matrix, from GLog.h5
+#   H1 = "H1E" = h1e for band structure calculations, from GLog.h5              
+#   R, Lambda, H1 are transformed from the cygutz symmetry adapted basis
+#       to the wannier basis, using information pulled from GBareH.h5 and GParam.h5.
+# ----------
+# k_list is a slice of the list of k-points
+# gmodel._gen_ham can substitute for the wannier-based hamiltonian
+# wfwannier_list is a list of overlap between band wavefunctions and 
+#           wannier orbitals [This is split over mpi processes.]
+# bnd_es_in is a list of eigenvalues
+# mode can be "tb" or "risb" 
+# evmode, if not zero, transforms the returned eigenvectors from  the wannier basis
+#   to the cygutz symmetry adapted basis     
 def get_bands(kpoints,
         gmodel=None,
         wfwannier_list=None,
@@ -112,49 +176,94 @@ def get_bands(kpoints,
         evmode=0,
         #0: bnd_vs is list of eigen-vectrors [v]; otheres: [R^\dag v R]
         ):
+    
     if mode == "risb":
+        # get_gloc_in_wannier_basis returns five matrices from GLog.h5:
+        #   "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian
+        #   "RMAT" = quasiparticle renormalization matrix
+        #   "NRLMAT" = local density part to be subtracted in density calculations
+        #   "NPHYMAT" = physical density matrix to be added in density calculations
+        #   "H1E" = h1e for band structure calculations
+        #  All of these matrices are transformed from the cygutz symmetry adapted basis
+        #       to the wannier basis, using information pulled from GBareH.h5 and GParam.h5.
+        # Also if some matrices are too small they may be padded with ones on the diagonal.       
         r_mat, lam_mat, _, _, h1_mat = get_gloc_in_wannier_basis()
-        ispin = r_mat.shape[0]
+        
+        # get the number of spins, ispin
+        ispin = r_mat.shape[0] 
+        
+        # get efermi from GLog.h5
         with h5py.File("GLog.h5", "r") as f:
             efermi = f["/"].attrs["efermi"]
     else:
         ispin = 1
         efermi = 0.
+        
     if evmode != 0:
         # get transformation from wannier basis to cygutz symmetry adapted
         # basis.
+        # get_wan2sab returns the transformation from wannier basis to cygutz symmetry adapted basis.
+        # This is multiple of two matrices, W H.
+        #   W = u_wan2csh  is a  matrix that sorts orbitals into first wannier orbitals and then non-wannier orbitals.
+        #       In the wannier portion of u_wan2csh, info is included about the basis
+        #       transformation from real spherical harmonics to complex spherical harmonics.  
+        #       This matrix is in GBareH.h5.
+        # H = csh2sab_list contains the transformation from the 
+        #   complex spherical harmonics basis to the g-risb symmetry adapted basis.
+        #   The matrix is in in GParam.h5/dbs2sab and GParam.h5/imap_list.          
         wan2sab = get_wan2sab()
 
     bnd_es = []
     bnd_vs = []
     for isp in range(ispin):
+        
+        # ispp is a second spin index
         if mode == "risb" and wfwannier_list is not None:
             ispp = min(isp, len(wfwannier_list)-1)
         else:
             ispp = min(0, isp)
+            
         bnd_es.append([])
         bnd_vs.append([])
+        
         for ik, kpt in enumerate(kpoints):
+            
             if gmodel is not None:
                 hmat = gmodel._gen_ham(kpt,ispp)
             else:
+                # hmat = R (W^\dagger E W - H1) R^T - Lambda
+                #   W = wfwannier_list is a list of overlap between band wavefunctions and 
+                #           wannier orbitals.
+                #   E = bnd_es_in is a list of band energies.
+                #   R = "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian
+                #   Lambda=  "RMAT" = quasiparticle renormalization matrix
+                #   H1 = "H1E" = h1e for band structure calculations                
                 hmat = wfwannier_list[ispp][ik].T.conj().dot(\
                         numpy.diag(bnd_es_in[ispp][ik])).dot(\
                         wfwannier_list[ispp][ik])
+               
             if mode == "risb":
                 hmat -= h1_mat[ispp]
                 hmat = r_mat[isp].dot(hmat).dot(r_mat[isp].T.conj())
                 hmat += lam_mat[isp]
+                
             evals, evecs = numpy.linalg.eigh(hmat)
+            
             # shift fermi level to zero.
             evals -= efermi
+            
             bnd_es[isp].append(evals)
+            
             if evmode == 0:
                 bnd_vs[isp].append(evecs)
             else:
                 bnd_vs[isp].append(r_mat[isp].dot(wan2sab).T.conj().dot(evecs))
+                
+    # Return the eigenvalues and eigenvectors of hmat. The eigenvalues first have the
+    #   Fermi level subtracted from them.      
     bnd_es = numpy.asarray(bnd_es)
     bnd_vs = numpy.asarray(bnd_vs)
+    
     return bnd_es, bnd_vs
 
 
@@ -180,13 +289,34 @@ def get_gmodel(wpath="../wannier", wprefix="wannier"):
     gmodel = wannier90.model()
     return gmodel
 
+    bnd_es, bnd_vs = mpiget_bndev(kpts, wfwannier_list=wfwannier_list,
+            bnd_es_in=bnd_es_in, mode="risb")
 
+# mpiget_bndev returns the eigenvalues and eigenvectors of hmat, the Gutzwiller
+#   hamiltonian. The eigenvalues first have the Fermi level (from GLog.h5) subtracted from them.      
+# hmat = R (W^\dagger E W - H1) R^T - Lambda
+#   W = wfwannier_list is a list of overlap between band wavefunctions and 
+#           wannier orbitals.
+#   E = bnd_es_in is a list of band energies.
+#   R = "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian, from GLog.h5
+#   Lambda=  "RMAT" = quasiparticle renormalization matrix, from GLog.h5
+#   H1 = "H1E" = h1e for band structure calculations, from GLog.h5              
+#   R, Lambda, H1 are transformed from the cygutz symmetry adapted basis
+#       to the wannier basis, using information pulled from GBareH.h5 and GParam.h5.
+# ----------
+# k_list is a slice of the list of k-points
+# gmodel._gen_ham can substitute for the wannier-based hamiltonian
+# wfwannier_list is a list of overlap between band wavefunctions and 
+#           wannier orbitals [This is split over mpi processes.]
+# bnd_es_in is a list of eigenvalues
+# mode can be "tb" or "risb" 
 def mpiget_bndev(k_list,
         gmodel=None,
         wfwannier_list=None,
         bnd_es_in=None,
         mode="tb",
         ):
+    
     comm = MPI.COMM_WORLD
     nktot = len(k_list)
     iksta, ikend = get_myk_range(nktot)
@@ -194,6 +324,30 @@ def mpiget_bndev(k_list,
     # wfwannier_list is always in local k-block
     if bnd_es_in is not None:
         bnd_es_in = bnd_es_in[:, iksta:ikend, :]
+ 
+#    bnd_es, bnd_vs = mpiget_bndev(kpts, wfwannier_list=wfwannier_list,
+#            bnd_es_in=bnd_es_in, mode="risb")
+
+    # get_bands returns the eigenvalues and eigenvectors of hmat, the Gutzwiller
+    #   hamiltonian. The eigenvalues first have the Fermi level (from GLog.h5) subtracted from them.      
+    # hmat = R (W^\dagger E W - H1) R^T - Lambda
+    #   W = wfwannier_list is a list of overlap between band wavefunctions and 
+    #           wannier orbitals.
+    #   E = bnd_es_in is a list of band energies.
+    #   R = "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian, from GLog.h5
+    #   Lambda=  "RMAT" = quasiparticle renormalization matrix, from GLog.h5
+    #   H1 = "H1E" = h1e for band structure calculations, from GLog.h5              
+    #   R, Lambda, H1 are transformed from the cygutz symmetry adapted basis
+    #       to the wannier basis, using information pulled from GBareH.h5 and GParam.h5.
+    # ----------
+    # k_list is a slice of the list of k-points
+    # gmodel._gen_ham can substitute for the wannier-based hamiltonian
+    # wfwannier_list is a list of overlap between band wavefunctions and 
+    #           wannier orbitals [This is split over mpi processes.]
+    # bnd_es_in is a list of eigenvalues
+    # mode can be "tb" or "risb" 
+    # evmode, if not zero, transforms the returned eigenvectors from  the wannier basis
+    #   to the cygutz symmetry adapted basis     
     bnd_es, bnd_vs = get_bands(kvec_loc,
             gmodel=gmodel,
             wfwannier_list=wfwannier_list,
@@ -210,26 +364,82 @@ def mpiget_bndev(k_list,
 
     return bnd_es, bnd_vs
 
-
+# get_wannier_den_matrix_risb calculates and returns the density matrix
+# There is special logic if ispin_risb > ispin_dft.
+#   There is also a check on whether the total number of electrons in the density
+#       matrix matches the total number calculated from ferwes.
+#  density matrix = \sum_{spin,k,bands} (1/wk * f_ispin) * (r_mat^\dagger * bnd_vs * ferwek * bndvs^\dagger * r_mat)
+#       + (n_phy_mat-nr_mat)T  
+# \rho_{A,B} =  R^\dagger_{A,a} * <a|psi>f<psi|b> * R_{b,B} 
+#            + n_phys.^{A,B} - n_{sub.}^{A,B}
+#   wk is the k-point weights
+#   f_ispin = 1 if doing spin-orbit, 2 otherwise
+#   bnd_vs is the eigenvectors of the Gutzwiller hamiltonian
+#   ferwek is the Fermi occupation factors, computed using the results of the Gutzwiller calculation
+#   nktot is the number of k-points
+#   r_mat is the quasiparticle renormalization matrix, from GLog.h5
+#   n_phys is the physical density matrix to be added in density calculations, from GLog.h5
+#   nr_mat is the local density part to be subtracted in density calculations, from GLog.h5
 def get_wannier_den_matrix_risb(bnd_vs, ferwes, wk, nktot):
+
+    # get_gloc_in_wannier_basis returns five matrices from GLog.h5:
+    #   "LAMAT" = renormalized local one-body part of the quasiparticle hamiltonian
+    #   "RMAT" = quasiparticle renormalization matrix
+    #   "NRLMAT" = local density part to be subtracted in density calculations
+    #   "NPHYMAT" = physical density matrix to be added in density calculations
+    #   "H1E" = h1e for band structure calculations
+    #  All of these matrices are transformed from the cygutz symmetry adapted basis
+    #       to the wannier basis, using information pulled from GBareH.h5 and GParam.h5.
+    # Also if some matrices are too small they may be padded with ones on the diagonal.    
     r_mat, _, nr_mat, nphy_mat, _ = get_gloc_in_wannier_basis()
+    
+    # 'ismear' = ismear # control['ismear'] This specifies the 
+    #       integration method: fermi or gaussian smearing.
+    #       gaussian smearing (ismear=0) or Fermi smearing (-1) or 
+    #           tetra-hedron method (-5) will be used for the brillouin zone integration.
+    #   brillouin zone integration method: fermi or gaussian smearing
+    # 'iso' = iso # if control['spin_orbit'] then iso=2, otherwise iso=1       
     with h5py.File("GBareH.h5", "r") as f:
         ispin_dft = f["/"].attrs["ispin"]
         iso = f["/"].attrs["iso"]
+       
+    # special logic if ispin_risb > ispin_dft
     ispin_risb = r_mat.shape[0]
-    # spin factor
-    f_ispin = 3-max(iso, ispin_risb)
+    
+    # spin factor = 1 if doing spin-orbit, 2 otherwise
+    f_ispin = 3 - max(iso, ispin_risb)
+    
     wan_den = []
-    # total number of electrons to be compared.
+    
+    # Calculate sum_elec1, total number of electrons, which will be compared to sum_elec2.
+    # ferwes is the Fermi weight.
+    #   The Fermi weight is defined individually as a function of orbital (including
+    #       Mott orbitals and also bands), spin, and k-point.
+    #  The fermi weight
+    #   may be governed by a Fermi-Dirac distribution if ismear=-1, or a 
+    #   Gaussian distribution if ismear=0. 
+    #   For Mott orbitals, the Fermi weight is defined as ne_mott/no_mott.    
     sum_elec1 = numpy.sum(ferwes)
     sum_elec2 = 0.
+
+    # loop over spins, with special logic if ispin_risb > ispin_dft
     for isp in range(ispin_risb):
+        
         if isp < ispin_dft:
             wan_den.append([])
         else:
             wan_den = numpy.asarray(wan_den)
+            
+        # loop over bands and k-points
+        #   dmk = \sum_{spin,k,bands} (1/wk * f_ispin) * (r_mat^\dagger * bnd_vs * ferwek * bndvs^\dagger * r_mat)
+        #       + (n_phy_mat-nr_mat)T  
+        # \rho_{A,B} =  R^\dagger_{A,a} * <a|psi>f<psi|b> * R_{b,B} 
+        #            + n_phys.^{A,B} - n_{sub.}^{A,B}
         for ik, bndvk1, ferwek1, wk1 in zip(it.count(),
                 bnd_vs[isp], ferwes[isp], wk):
+            
+            dmk = (1/wk * f_ispin) * Tr(r_mat^\dagger * bnd_vs * ferwek * bndvs^\dagger * r_mat)
+                + Tr((n_phy_mat-nr_mat)^T)  
             # notice the convention a bit different from cygutz.
             # <a|psi>f<psi|b>
             afb = bndvk1.dot(numpy.diag(ferwek1/wk1/f_ispin)).dot(\
@@ -240,12 +450,15 @@ def get_wannier_den_matrix_risb(bnd_vs, ferwes, wk, nktot):
             # \rho_{A,B} = R^\dagger_{A,a} * <a|psi>f<psi|b> * R_{b,B}
             #            +(n_phys.^{A,B} - n_{sub.}^{A,B})
             dmk += (nphy_mat[isp]-nr_mat[isp]).T
+            
             sum_elec2 += dmk.trace()*wk1*f_ispin
+            
             if isp < ispin_dft:
                 wan_den[-1].append(dmk)
             else:
                 wan_den[-1][ik] += dmk
                 wan_den[-1][ik] *= 0.5
+                
     sum_elec2 = sum_elec2.real
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -256,6 +469,7 @@ def get_wannier_den_matrix_risb(bnd_vs, ferwes, wk, nktot):
         elec_diff = sum_elec_all2 - sum_elec_all1
         if numpy.abs(elec_diff) > 0.1:
             raise ValueError(f"too big charge difference: {elec_diff:.2f}")
+            
     wan_den = numpy.asarray(wan_den)
     # merge wan_den to master node
     wan_den_list = comm.gather(wan_den, root=0)

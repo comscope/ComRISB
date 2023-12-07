@@ -21,7 +21,10 @@ def get_cygtail():
                 cygtail = "R"
     return cygtail
 
-
+# todo
+# solve the list of inequivalent embedding Hamiltonian.
+#   iembeddiag = choice embedding h solver (int). 10 mean Hartree-Fock.
+#       if iembeddiag=10=Hartree-Fock then do nothing
 def solve_hembed_list(
         mpi=["mpirun", "-np", "1"],
         path=get_groot(),
@@ -33,44 +36,66 @@ def solve_hembed_list(
         save_hemb_history=False,
         **kwargs,
         ):
+    
     from pygrisb.gsolver.gs_driver import driver as gs_driver
-    # solve the list of inequivalent embedding Hamiltonian.
+    
+    # _iembeddiag = GParam.h5/giembeddiag
     with h5open("GParam.h5", "r") as f:
         imap_list = f["/"].attrs["imap_list"]
         nval_bot_list = f["/"].attrs["nval_bot_list"]
         nval_top_list = f["/"].attrs["nval_top_list"]
         _iembeddiag = f["/"].attrs["giembeddiag"]
+        
     if iembeddiag is None:
-        iembeddiag = _iembeddiag
-    if iembeddiag == 10:
+        iembeddiag = _iembeddiag # _iembeddiag = GParam.h5/giembeddiag
+        
+    if iembeddiag == 10: # if iembeddiag=10=Hartree-Fock then do nothing
         # hartree-fock
         return
+    
     if nval_list is None:
         # default for ml solver.
-        nval_list = [5 for i in imap_list]
+        nval_list = [5 for i in imap_list] # imap_list = GParam.h5/imap_list
     elif len(nval_list) == 1:
         nval = nval_list[0]
         nval_list = [nval for i in imap_list]
     else:
         assert(len(nval_list) == len(imap_list)), \
                 f"nval_list = {nval_list}: inconsistent length!"
+                
     print(f" nval_list for ml solver: {nval_list}")
-    for i, imap in enumerate(imap_list):
+    
+    for i, imap in enumerate(imap_list): # imap_list = GParam.h5/imap_list
         if i==imap:
+            
+            # driver calls one of the following methods:
+            # iembeddiag == -10: gs_ml.gs_h5ml_fsoc_krr(imp=imp, jac=jac) -> kernel ridge machine learning
+            # iembeddiag == -11: gs_ml.gs_h5ml_fsoc_nm1d(nval=nval, imp=imp, jac=jac) -> machine learning with normal-mode expansion at 1st order for multivariate interpolation
+            # iembeddiag == -13: gs_ml.gs_h5ml_fsoc_nm2d(nval=nval, imp=imp, jac=jac) -> machine learning with normal-mode expansion at 2nd order for multivariate interpolation
+            # iembeddiag == -14: gs_ml.gs_h5ml_fsoc_nm3d(nval=nval, imp=imp, jac=jac) -> machine learning with normal-mode expansion at 3rd order for multivariate interpolation
+            # iembeddiag in [-1, -2, -3, -4, -201]: runs exe_spci{cygtail.lower()} with some arguments
+            # iembeddiag == 1: gsolver_h5trans_ed(imp=imp, mpiexec=mpiexec, path=path, nval_bot=nval_bot, nval_top=nval_top) 
+            #       -> runs exe_ed, parallel exact diagonalization solver with hamiltonian transformed
+            #           into complex spherical hamrmonics basis with spin-faster index.
+            # iembeddiag == 101: gsolver_h5ed(imp=imp, mpiexec=mpiexec, path=path, nval_bot=nval_bot, nval_top=nval_top)
+            #       -> runs exe_ed, parallel exact diagonalization solver
+            # iembeddiag == 50: gsolver_vhs(imp=imp,]read_v2e=True,) -> I can't find the source code.
+            # iembeddiag == 10: Hartree-Fock, so do nothing.
             gs_driver(imp=i,
                     iembeddiag=iembeddiag,
                     path=path,
                     mpiexec=mpi,
                     nval=nval_list[i],
-                    nval_bot=nval_bot_list[i],
-                    nval_top=nval_top_list[i],
+                    nval_bot=nval_bot_list[i],# nval_bot_list = GParam.h5/nval_bot_list
+
+                    nval_top=nval_top_list[i],# nval_top_list = GParam.h5/nval_top_list
                     edinit=edinit,
                     cygtail=cygtail,
                     jac=jac,
                     )
 
     with h5open("HEmbed.h5", "a") as f:
-        for i, imap in enumerate(imap_list):
+        for i, imap in enumerate(imap_list): # imap_list = GParam.h5/imap_list
             if i == imap:
                 if "ans" in f[f"/impurity_{i}"]:
                     del f[f"/impurity_{i}/ans"]
@@ -128,7 +153,11 @@ def solve_hembed_list(
                             del fh[f"/impurity_{i}/emol_history"]
                         fh[f"/impurity_{i}/emol_history"] = emol_array
 
-
+    # exec_cygband updates quasiparticle bands:
+#   - Sets up GIter.h5 : (a) writes x to GIter.h5/x_val, 
+#                        (b) increments GIter.h5/iter
+#                        (c) removes GIter.h5/v_err
+#   - Runs CyGBand{cygtail} -w 0, and if "jac" = False then it adds -d 1                        
 def exec_cygband(
         x,
         mpi=["mpirun", "-np", "1"],
@@ -136,6 +165,7 @@ def exec_cygband(
         cygtail="",
         **kwargs,
         ):
+    
     # set the new trial solution vector
     with h5open("GIter.h5", "a") as f:
         if x is not None:
@@ -144,11 +174,15 @@ def exec_cygband(
         f["/"].attrs["iter"] += 1
         if "/v_err" in f:
             del f["/v_err"]
+            
     # calculate the updated qp bands and qp local quantities.
     cmd = mpi + [f"{path}/CyGBand{cygtail}", "-w", "0"]
+    
     if kwargs.get("jac", False):
         cmd += ["-d", "1"]
+        
     print(" ".join(cmd))
+    
     subprocess.run(cmd, check=True)
 
 
@@ -193,10 +227,16 @@ def gfun_solver(x,
         ):
     '''Gutzwiller vector error function. Using sparse matrix full-CI.
     '''
-    # update quasiparticle bands
+    # exec_cygband updates quasiparticle bands:
+    #   - Sets up GIter.h5 : (a) writes x to GIter.h5/x_val, 
+    #                        (b) increments GIter.h5/iter
+    #                        (c) removes GIter.h5/v_err
+    #   - Runs CyGBand{cygtail} -w 0, and if "jac" = False then it adds -d 1                        
     exec_cygband(x, **args)
+    
     # solve the list of inequivalent embedding Hamiltonian.
     solve_hembed_list(**args)
+    
     # calculate error vector
     verr = exec_cygerr(**args)
     # adding absolute convergence criteria
@@ -226,8 +266,14 @@ def ndlc_fun(x,
                 "path":"./",
                 "cygtail":""},
         ):
-    # update quasiparticle bands
+    
+    # exec_cygband updates quasiparticle bands:
+    #   - Sets up GIter.h5 : (a) writes x to GIter.h5/x_val, 
+    #                        (b) increments GIter.h5/iter
+    #                        (c) removes GIter.h5/v_err
+    #   - Runs CyGBand{cygtail} -w 0, and if "jac" = False then it adds -d 1                            
     exec_cygband(x, **args)
+    
     dsetname1 = args.get("dsetname1", "/d_coef")
     dsetname2 = args.get("dsetname2", "/lc_coef")
     with h5open("HEmbed.h5", "r") as f:
@@ -236,7 +282,7 @@ def ndlc_fun(x,
     verr = np.concatenate((dset1, dset2))
     return verr
 
-
+# todo
 def get_jacobian_analytical(
         x,
         args={"mpi":["mpirun", "-np", "1"],
@@ -244,11 +290,20 @@ def get_jacobian_analytical(
                 "edinit":0,
                 "cygtail":""},
         ):
+    
+    # exec_cygband updates quasiparticle bands:
+    #   - Sets up GIter.h5 : (a) writes x to GIter.h5/x_val, 
+    #                        (b) increments GIter.h5/iter
+    #                        (c) removes GIter.h5/v_err
+    #   - Runs CyGBand{cygtail} -w 0                           
     exec_cygband(x, **args, jac=True)
+    
     # solve the list of inequivalent embedding Hamiltonian.
     solve_hembed_list(**args, jac=True)
+    
     # calculate error vector
     _, jac = exec_cygerr(**args, jac=True)
+    
     print(" analytical jacobian called!")
     return jac
 
@@ -334,6 +389,9 @@ def gsolve_nleqns(
     return verr
 
 
+# get_jacobian_numerical returns jac^T, where
+#   jac = (vec_fun(x_list+delta)-vec_fun(x_list))/delta
+#   The default values are delta = 1.e-4 and vec_fun=gfun_solver
 def get_jacobian_numerical(
         x_list,
         args={"mpi":["mpirun", "-np", "1"],
@@ -341,21 +399,39 @@ def get_jacobian_numerical(
         delta=1.e-4,
         vec_fun=gfun_solver,
         ):
+    
     jac = []
+    
     args["adjust_verr"] = False
+    
     vref = vec_fun(x_list, args=args)
+    
     for i,_ in enumerate(x_list):
         xs = x_list.copy()
         xs[i] += delta
         v = vec_fun(xs, args=args)
         jac.append((v-vref)/delta)
+        
     # recover the intial point
     with h5open("GIter.h5", "a") as f:
        f["/x_val"][()] = x_list
+       
     print(" numerical jacobian called!")
+    
     return np.asarray(jac).T
 
-
+# get_inline_args (1) reads the following things off the command line:
+#       (2) If jac = -1 then it sets args.jac = get_jacobian_numerical
+#           If jac =  1 then it sets args.jac = get_jacobian_analytical
+#           Otherwise        it sets args.jac = None
+#   path = executible path
+#   iembeddiag = choice embedding h solver (int)
+#   edinit = ed solver init guess (int)
+#   mpi = mpirun prefix (str)
+#   rmethod = nonlinear solver method (str)
+#   jac = jacobian method: 0->no, 1->analytical, -1: numerical
+#   tol = tolerance (float)
+#   iupdaterho = update rho (int): 0, default: no; 1: kswt; 2: no kswt
 def get_inline_args():
     g_root = get_groot()
     parser = argparse.ArgumentParser()
@@ -387,7 +463,22 @@ def get_inline_args():
 
 
 def run_solve_hembed_list():
+    
+    # get_inline_args (1) reads the following things off the command line:
+    #       (2) If jac = -1 then it sets args.jac = get_jacobian_numerical
+    #           If jac =  1 then it sets args.jac = get_jacobian_analytical
+    #           Otherwise        it sets args.jac = None
+    #   path = executible path
+    #   iembeddiag = choice embedding h solver (int)
+    #   edinit = ed solver init guess (int)
+    #   mpi = mpirun prefix (str)
+    #   rmethod = nonlinear solver method (str)
+    #   jac = jacobian method: 0->no, 1->analytical, -1: numerical
+    #   tol = tolerance (float)
+    #   iupdaterho = update rho (int): 0, default: no; 1: kswt; 2: no kswt
     args = get_inline_args()
+
+    # solve the list of inequivalent embedding Hamiltonian.    
     solve_hembed_list(
             path=args.path,
             iembeddiag=args.iembeddiag,
@@ -395,20 +486,33 @@ def run_solve_hembed_list():
             mpi=args.mpi,
             cygtail=get_cygtail(),
             )
-
-
+    
 def run_cygutz(
         path=get_groot(),
         rmethod="hybr",
         jac=0,
-        mpi=["mpirun", "-np", "1"],
+        mpi=["mpirun", "-np", "1"], # overridden by comdmft
         iembeddiag=None,
         edinit=0,
         tol=1e-6,
         cmdlargs=True,
-        iupdaterho=0,
+        iupdaterho=0, # iupdaterho=2 when called from comdmft
         ):
+    
     if cmdlargs:
+        
+        # get_inline_args (1) reads the following things off the command line:
+        #       (2) If jac = -1 then it sets args.jac = get_jacobian_numerical
+        #           If jac =  1 then it sets args.jac = get_jacobian_analytical
+        #           Otherwise        it sets args.jac = None
+        #   path = executible path
+        #   iembeddiag = choice embedding h solver (int)
+        #   edinit = ed solver init guess (int)
+        #   mpi = mpirun prefix (str)
+        #   rmethod = nonlinear solver method (str)
+        #   jac = jacobian method: 0->no, 1->analytical, -1: numerical
+        #   tol = tolerance (float)
+        #   iupdaterho = update rho (int): 0, default: no; 1: kswt; 2: no kswt
         args = get_inline_args()
         path = args.path
         rmethod = args.rmethod
@@ -473,7 +577,21 @@ def driver_cygutz(
 
 
 def check_jacobian():
+    
+    # get_inline_args (1) reads the following things off the command line:
+    #       (2) If jac = -1 then it sets args.jac = get_jacobian_numerical
+    #           If jac =  1 then it sets args.jac = get_jacobian_analytical
+    #           Otherwise        it sets args.jac = None
+    #   path = executible path
+    #   iembeddiag = choice embedding h solver (int)
+    #   edinit = ed solver init guess (int)
+    #   mpi = mpirun prefix (str)
+    #   rmethod = nonlinear solver method (str)
+    #   jac = jacobian method: 0->no, 1->analytical, -1: numerical
+    #   tol = tolerance (float)
+    #   iupdaterho = update rho (int): 0, default: no; 1: kswt; 2: no kswt    
     args = get_inline_args()
+    
     # get the point around which the jacobian is calculated.
     with h5open("GIter.h5", "r") as f:
         x0 = f["/x_val"][()]
@@ -484,6 +602,10 @@ def check_jacobian():
             "edinit":args.edinit,
             "cygtail":get_cygtail(),
             }
+    
+    # get_jacobian_numerical returns jac^T, where
+    #   jac = (vec_fun(x_list+delta)-vec_fun(x_list))/delta
+    #   The default values are delta = 1.e-4 and vec_fun=gfun_solver
     jac_num = get_jacobian_numerical(
             x0.copy(),
             args=args_,
@@ -511,7 +633,21 @@ def check_jacobian():
 def check_jac_ndlc(dsetnames1=["/d_coef", "/lc_coef"],
         dsetnames2=["/PD_COEFPR", "/PD_COEFPL",
                 "/PLC_COEFPR", "/PLC_COEFPL"]):
+            
+    # get_inline_args (1) reads the following things off the command line:
+    #       (2) If jac = -1 then it sets args.jac = get_jacobian_numerical
+    #           If jac =  1 then it sets args.jac = get_jacobian_analytical
+    #           Otherwise        it sets args.jac = None
+    #   path = executible path
+    #   iembeddiag = choice embedding h solver (int)
+    #   edinit = ed solver init guess (int)
+    #   mpi = mpirun prefix (str)
+    #   rmethod = nonlinear solver method (str)
+    #   jac = jacobian method: 0->no, 1->analytical, -1: numerical
+    #   tol = tolerance (float)
+    #   iupdaterho = update rho (int): 0, default: no; 1: kswt; 2: no kswt            
     args = get_inline_args()
+    
     # get the point around which the jacobian is calculated.
     with h5open("GIter.h5", "r") as f:
         x0 = f["/x_val"][()]
@@ -523,6 +659,10 @@ def check_jac_ndlc(dsetnames1=["/d_coef", "/lc_coef"],
             "dsetname1":dsetnames1[0],
             "dsetname2":dsetnames1[1],
             }
+    
+    # get_jacobian_numerical returns jac^T, where
+    #   jac = (vec_fun(x_list+delta)-vec_fun(x_list))/delta
+    #   The default values are delta = 1.e-4 and vec_fun=gfun_solver
     jac_num = get_jacobian_numerical(
             x0.copy(),
             args=args_,
@@ -535,7 +675,13 @@ def check_jac_ndlc(dsetnames1=["/d_coef", "/lc_coef"],
         print("".join(f"{a:8.4f} " for a in row))
 
     # analytical jacobian
+    # exec_cygband updates quasiparticle bands:
+    #   - Sets up GIter.h5 : (a) writes x to GIter.h5/x_val, 
+    #                        (b) increments GIter.h5/iter
+    #                        (c) removes GIter.h5/v_err
+    #   - Runs CyGBand{cygtail} -w 0, and if "jac" = False then it adds -d 1                            
     exec_cygband(x0, **args_, jac=True)
+    
     with h5open("GDLDeri.h5", "r") as f:
         dset1 = f[dsetnames2[0]][()].T
         dset2 = f[dsetnames2[1]][()].T

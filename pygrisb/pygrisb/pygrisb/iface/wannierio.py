@@ -2,7 +2,19 @@ import numpy, h5py
 from mpi4py import MPI
 from scipy.io import FortranFile
 
-
+# get_wannier_data_binary reads info out of wannier.dat
+#   - reals_lat is the real space lattice vectors
+#   - recip_lat is the reciprocal space lattice vectors
+#   - kpts is a list of all the k-points
+#   - include_bands is low energy band indices included in the wannier construction
+#   - wfwannier_list is a list of overlap between band wavefunctions and wannier orbitals
+#   - bnd_es list of band energies
+# Things read but not returned directly:
+#   - num_bands is the maximal number of bands (controls the size of wfwannier_list,
+#            bnd_es)
+#   - num_wann is the number of wannier orbitals ( controlls the size of wfwannier_list)
+#   - ndiv is the k-point mesh (not returned at all, but the number of k-points
+#           controls  the size of kpts, wfwannier_list, bnd_es)
 def get_wannier_data_binary(fname):
     with FortranFile(fname, "r") as f:
         # real space lattice vectors
@@ -54,7 +66,8 @@ def h5get_wannier_data(fname):
         bnd_es = f["/eigenvalues"][()].reshape((1, nqdiv, num_bands))
     return reals_lat, recip_lat, kpts, include_bands, wfwannier_list, bnd_es
 
-
+# get_wannier_data calls get_wannier_data_binary, which reads data
+#    out of wannier.dat . For more info look at the comments on get_wannier_data_binary.
 def get_wannier_data(path="./"):
     fname = "{}/wannier.dat".format(path)
     try:
@@ -86,23 +99,32 @@ def chk_orthonormality(vw_list):
                 raise ValueError("vw not orthonormal.")
 
 
+# mpiget_wannier_data calls get_wannier_data_binary, which reads data
+#    out of wannier.dat . For more info look at the comments on get_wannier_data_binary.
+#   It broadcasts reals_lat, recip_lat, kpts, bnd_es, include_bands to all mpi processes.
+#   It also splits kpts and wfwannier_list between mpi processes.
+#       After the split, the local process' k-points are stored in k_range,
+#       and its share of wfwannier_list is still called wfwannier_list.
 def mpiget_wannier_data(path="./"):
     '''get the contents in wannier.dat Fortran binary file.
     '''
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     ncpu = comm.Get_size()
+    
     if rank == 0:
         reals_lat, recip_lat, kpts, include_bands, wfwannier_list, bnd_es =\
                 get_wannier_data(path=path)
     else:
         reals_lat = recip_lat = kpts = include_bands = wfwannier_list = \
                 bnd_es = k_range = None
+                
     reals_lat = comm.bcast(reals_lat, root=0)
     recip_lat = comm.bcast(recip_lat, root=0)
     kpts = comm.bcast(kpts, root=0)
     bnd_es = comm.bcast(bnd_es, root=0)
     include_bands = comm.bcast(include_bands, root=0)
+    
     if rank == 0:
         from pygrisb.mpi.mpi import get_k_range_list as get_k_range_list
         k_range_list = get_k_range_list(kpts.shape[0])
@@ -117,6 +139,7 @@ def mpiget_wannier_data(path="./"):
     # distributed evenly among cores with respect to k-points
     wfwannier_list = comm.scatter(wfwannier_bklist, root=0)
     k_range = comm.scatter(k_range_list, root=0)
+    
     return reals_lat, recip_lat, kpts, include_bands, wfwannier_list, bnd_es, \
             k_range
 

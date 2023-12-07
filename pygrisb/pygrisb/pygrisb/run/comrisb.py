@@ -12,7 +12,13 @@ def open_h_log(control):
             "             ComRISB\n" +
             "*********************************\n\n")
 
-
+# init_comrisb:
+#   - reads in  comrisb.ini
+#   - loads ginit.json into  control['impurity_problem'] and control['impurity_solution']
+#   - parses its arguments: 
+#       -s or --startp sets control['start_prog']
+#       -e or --endp sets control['end_prog']
+#       -c or --continuous sets control['restart']
 def init_comrisb():
     vglobl = {}
     vlocal = {}
@@ -63,7 +69,7 @@ def init_comrisb():
     # convergence table
     control['conv_table'] = []
 
-    # load ginit.json
+    # load ginit.json into  control['impurity_problem'] and control['impurity_solution']
     ginit = json.load(open(f"{control['lowh_directory']}/ginit.json", "r"))
     control["spin_orbit"] = ginit["gchoice"]["iso"] == 2
     # get impurity_problem
@@ -76,9 +82,11 @@ def init_comrisb():
                     [iun]])
     control['impurity_problem'] = impurities
     control['impurity_solution'] = control.get('impurity_solution', 1)
+    
     # fermi-dirac, only option in rspflapw.
     control['ismear'] = -1
-    # smearing factor. default 300K to eV
+    
+    # smearing factor. default 300K to eV   
     with open(f"{control['initial_lattice_dir']}/ini", "r") as f:
         for line in f:
             if 'temperature' in line:
@@ -97,7 +105,10 @@ def init_comrisb():
     control['cc'] = control.get('cc', 1.e-8)
     control['ec'] = control.get('ec', 1.e-4)
 
-
+# The arguments are parsed:
+#   -s or --startp sets control['start_prog']
+#   -e or --endp sets control['end_prog']
+#   -c or --continuous sets control['restart']
     parser = argparse.ArgumentParser(description="Driver for comrisb job.")
     parser.add_argument("-s", "--startp", type=str, default='initcopy',
             help="starting program (str) [initcopy, wannier, gwann, dft]")
@@ -134,7 +145,13 @@ def init_comrisb():
 
     return control, wan_hmat, imp
 
-
+# find_impurity_wan sets up control['impurity_wan'], based on the 
+#   contents of wan_hmat['basis']
+#   wan_hmat['basis'] is populated by read_wan_hmat_basis from wannier.inip, and it
+#       it is used only here and in get_locrot_list. 
+#  control['impurity_wan'] is used only to populate params["corbs_list"] ,
+#       which is passed to the gutzwiller solver.  
+#   find_impurity_wan is implemented only for d,f, and not s,p shells.
 def find_impurity_wan(control, wan_hmat, tol=1.e-6):
     num_wann = np.shape(wan_hmat['basis'])[0]
     control['impurity_wan'] = []
@@ -196,10 +213,19 @@ def initial_lattice_directory_setup(control):
     os.chdir(control['top_dir'])
 
 
+# create_comwann_ini creates comwann.ini.  If not doing a qsgw calculation,
+#   it uses information about the band energies and fermi level to decide
+#   the values of wan_hmat['froz_win_min'] and wan_hmat['dis_win_min'] .
 def create_comwann_ini(control, wan_hmat):
+
+    # Begin: This block gets el, eh, and efermi, and is not used if doing a qsgw calculation.
+
+    # get ncoremax, a count of bands, from wannier_win.dat.    
     line = open(control['lattice_directory']+ \
-            "/wannier_win.dat","rb").readline()
+            "/wannier_win.dat","rb").readline()    
     ncoremax = int(line.split()[-1])
+    
+    # read in ebands and efermi
     with h5py.File(f"{control['lattice_directory']}/{control['allfile']}.rst",
             "r") as f:
         if "qsgw" in control["method"]:
@@ -208,7 +234,14 @@ def create_comwann_ini(control, wan_hmat):
         else:
             ebands = f[f"/{control['allfile']}/e_bnd/dft"][()]
             efermi = f["/chemical_potential/dft/chem_pot"][0]
+            
+    # Using ebands, decide the highest and lowest band energies, el and eh.
     el, eh = np.max(ebands[0, :, ncoremax-1]), np.min(ebands[0, :, ncoremax])
+
+    # End: This block gets el, eh, and efermi, and is not used if doing a qsgw calculation.
+    
+    # Decide  the values of wan_hmat['froz_win_min'] and wan_hmat['dis_win_min']
+    #   If not doing qsgw, these values are decided by using el, eh, and efermi.
     if "qsgw" in control["method"]:
         # the qp energies not gapped some how.
         # can be specified in comrisb.ini.
@@ -238,12 +271,17 @@ def create_comwann_ini(control, wan_hmat):
         f.write(str(wan_hmat['froz_win_min'])+'\n')
         f.write(str(wan_hmat['num_iter'])+'\n')
         f.write(str(wan_hmat['dis_num_iter'])+'\n')
-        f.write('0\n')
+        f.write('0\n') # wan_hmat['write_wan'] is ignored and hard-coded to 0.
         f.write(str(wan_hmat['cut_low'])+'\n')
         f.write(str(wan_hmat['cut_froz'])+'\n')
         f.write(str(wan_hmat['cut_total'])+'\n')
+#        f.write(str(wan_hmat['radfac'])+'\n')
+#        wan_hmat['froz_win_max_fac']=wan_hmat.get('froz_win_max_fac', 0.7)    
+#        f.write(str(wan_hmat['froz_win_max_fac'])+'\n')        
+        
 
 
+# read_wan_hmat_basis reads wannier.inip into the returned variable
 def read_wan_hmat_basis(control):
     # in the wannier directory
     inip = np.loadtxt(control['wannier_directory']+'/wannier.inip')
@@ -278,10 +316,13 @@ def labeling_file(filename, iter_string):
     shutil.copy(dirname+'/'+filenameonly, dirname+"/" +
                 '.'.join(temp[0:-1])+iter_string+'.'+temp[-1])
 
-
+# write_conv gathers info from rspflapw's out file, from GLog.h5,
+#   and from GIter.h5, and writes it out in convergence.log
 def write_conv(control):
     os.chdir(control['lattice_directory'])
     iter_string = '_' + str(control['iter_num_outer'])
+    
+    # read in delta_rho and ETOT from rspflapw's out file
     with open('./dft'+iter_string+'.out', "r") as f:
         for line in f:
             if "charge density" in line:
@@ -290,6 +331,8 @@ def write_conv(control):
             elif "ETOT" in line:
                 line = line.split()
                 etot = float(line[4])
+                
+    # read in mu=efermi, egamma_dc, ebands, ebands_bare, RMAT from GLog.h5
     with h5py.File(control['lowh_directory']+"/GLog.h5", "r") as f:
         mu = f["/"].attrs["efermi"]
         egamma_dc = f["/"].attrs["egamma_dc"]
@@ -297,23 +340,32 @@ def write_conv(control):
         ebands_bare = f["/"].attrs["ebands_bare"]
         rmat2 = f["/"].attrs["RMAT"].swapaxes(1,2)
 
-    etot += (egamma_dc + sum(ebands-ebands_bare))/rydberg_to_ev
+    # calculate etot
+    # save control['iter_num_outer'], delta_rho, etot in convergence.log
+    etot += (egamma_dc + sum(ebands-ebands_bare))/rydberg_to_ev   
     control['conv_table'].append(
             [control['iter_num_outer'],
             delta_rho,
             etot])
 
+    # read in v_err from GIter.h5
+    # save mu=efermi, err_risb in convergence.log
     with h5py.File(control['lowh_directory']+"/GIter.h5", "r") as f:
         v_err = f["/v_err"][()]
         err_risb = v_err[abs(v_err).argmax()]
         control['conv_table'][-1].extend([mu, err_risb])
+        
     # check quasiparticle weight
+    # zmat = rmat^\dagger * rmat
+    # save zmin in convergence.log
     zmin = 100.
     for rmat in rmat2:
         zmat = rmat.T.conj().dot(rmat)
         w = np.linalg.eigvalsh(zmat)
-        zmin = min(zmin, np.amin(w))
+        zmin = min(zmin, np.amin(w))        
     control['conv_table'][-1].append(zmin)
+    
+    # save out 
     os.chdir(control['top_dir'])
     with open("convergence.log", "w") as f:
         f.write(tabulate(control['conv_table'], \
@@ -322,17 +374,25 @@ def write_conv(control):
                 numalign="right",  floatfmt=".8f"))
         f.write('\n')
 
-
+# check_wannier_function_input creates comwann.ini
 def check_wannier_function_input(control, wan_hmat):
     os.chdir(control['wannier_directory'])
+    
+    # create_comwann_ini creates comwann.ini.  If not doing a qsgw calculation,
+#   it uses information about the band energies and fermi level to decide
+#   the values of wan_hmat['froz_win_min'] and wan_hmat['dis_win_min'] .
     create_comwann_ini(control, wan_hmat)
+    
     if os.path.exists(control['top_dir']+'/local_axis.dat'):
         shutil.copy(control['top_dir']+'/local_axis.dat', './')
+        
     os.chdir(control['top_dir'])
 
-
+# run_dft runs rspflapw
 def run_dft(control):
+    
     os.chdir(control['lattice_directory'])
+    
     iter_string = '_'+str(control['iter_num_outer'])
     cmd = control['mpi_prefix_lattice'] + ' ' + \
             control['comsuitedir'] + "/rspflapw.exe"
@@ -355,7 +415,8 @@ def run_dft(control):
     control['h_log'].write("dft calculation done.\n")
     os.chdir(control['top_dir'])
 
-
+# prepare_dft_input makes sure that  wannier_den_matrix.dat is in 
+#       the right place for rspflapw to use it.
 def prepare_dft_input(control):
     shutil.copy(control['lowh_directory']+"/wannier_den_matrix.dat",
             control['lattice_directory'])
@@ -367,6 +428,13 @@ def hlog_time(f, prestr, endl=""):
             endl))
     f.flush()
 
+
+# wannier_run:
+#   - runs ComWann, but only if the fullrun argument is True
+#   - reads wannier.inip, and uses it to set up control['impurity_wan']
+#       control['impurity_wan'] is used only to populate params["corbs_list"] ,
+#           which is passed to the gutzwiller solver.  
+# wannier_run is implemented only for d,f, and not s,p shells.   
 def wannier_run(control,wan_hmat,fullrun=True):
     os.chdir(control['wannier_directory'])
     if fullrun:
@@ -391,13 +459,26 @@ def wannier_run(control,wan_hmat,fullrun=True):
         iter_string = '_' + str(control['iter_num_outer'])
         shutil.move('./wannier.wout', './wannier'+iter_string+'.wout')
 
+    # read_wan_hmat_basis reads wannier.inip into wan_hmat['basis']
     wan_hmat['basis'] = read_wan_hmat_basis(control)
+    
+    # find_impurity_wan sets up control['impurity_wan'], based on the 
+    #   contents of wan_hmat['basis']
+    #   wan_hmat['basis'] is populated by read_wan_hmat_basis from wannier.inip, and it
+    #       it is used only here and in get_locrot_list. 
+    #  control['impurity_wan'] is used only to populate params["corbs_list"] ,
+    #       which is passed to the gutzwiller solver.  
+    #   find_impurity_wan is implemented only for d,f, and not s,p shells.
     find_impurity_wan(control, wan_hmat)
+    
     control['h_log'].write("control['impurity_wan']: {}\n".format(\
             control['impurity_wan']))
     os.chdir(control['top_dir'])
 
-
+# get_locrot_list calculates a rotation matrix based on the xaxis and yaxis
+#   supplied by wannier.inip
+#   wan_hmat['basis'] is populated by read_wan_hmat_basis from wannier.inip, and it
+#       it is used only here and in find_impurity_wan. 
 def get_locrot_list(wan_hmat):
     iatm = -1
     lrot_list = []
@@ -410,9 +491,22 @@ def get_locrot_list(wan_hmat):
             iatm = basis["atom"]
     return lrot_list
 
+# gwannier_run:
+#   - saves out various parameters into gwannier_params.pkl
+#   - runs gwannier.py
+#   - runs pygrisb.run.cygutz.driver_cygutz, not as an external process
+#   - runs gwannden.py
 def gwannier_run(control, wan_hmat, imp, icycle):
+        
     os.chdir(control['lowh_directory'])
+
+    # get_locrot_list calculates a rotation matrix based on the xaxis and yaxis
+    #   supplied by wannier.inip
+    #   wan_hmat['basis'] is populated by read_wan_hmat_basis from wannier.inip, and it
+    #       it is used only here and in find_impurity_wan.     
     lrot_list = get_locrot_list(wan_hmat)
+    
+    # Save all of these variables in gwannier_params.pkl
     params = {}
     params["corbs_list"] = control['impurity_wan']
     params["wpath"] = control['wannier_directory']
@@ -429,6 +523,7 @@ def gwannier_run(control, wan_hmat, imp, icycle):
     with open("gwannier_params.pkl", "wb") as f:
         pickle.dump(params, f, protocol=pickle.HIGHEST_PROTOCOL)
 
+    # run gwannier.py
     cmd = control['mpi_prefix_wannier'] + ' ' + \
             control['comsuitedir'] + "/gwannier.py"
     control['h_log'].write(cmd+"\n")
@@ -445,28 +540,34 @@ def gwannier_run(control, wan_hmat, imp, icycle):
     t_end = time.time()
     control['t_interface'] += t_end-t_start
 
+    # run pygrisb.run.cygutz.driver_cygutz, not as an external process
     # cygutz calculation
     cmd =  control['comsuitedir'] + "/run_cygutz.py -u 2"
     control['h_log'].write(cmd+"\n")
     hlog_time(control['h_log'], "cygutz start")
     t_start = time.time()
+    
     if control['impurity_solution'] == 0:
         if os.path.isfile("GLog.h5"):
             os.remove("GLog.h5")
+            
     err = driver_cygutz(path=control['comsuitedir'],
             rmethod="hybr",
             mpi=control['mpi_prefix'].split(),
             tol=1e-6,
             iupdaterho=2,
             )
+    
     hlog_time(control['h_log'], "end", endl="\n")
     t_end = time.time()
     control['t_cygutz'] += t_end-t_start
+    
     if err > 0.1:
         raise ValueError("cygutz failed to converge.")
 
     shutil.copy("./Gutz.log", "save_Gutz.log")
 
+    # run gwannden.py
     cmd = control['mpi_prefix_wannier'] + ' ' + \
             control['comsuitedir'] + "/gwannden.py"
     control['h_log'].write(cmd+"\n")
@@ -496,13 +597,17 @@ def find_allfile(dft_dir):
 
 
 def dft_risb(control, wan_hmat, imp):
+    
     control['h_log'].write("\n\n")
     control['iter_num_outer'] = 0
+    
     while control['iter_num_outer'] < control['max_iter_num_outer']:
+        
         control['h_log'].write(\
                 "************************************************\n"+ \
                 "iteration: {}\n".format(control['iter_num_outer'])+ \
                 "************************************************\n")
+        
         if control['iter_num_outer'] == 0 and \
                 control['start_prog'] in ["initcopy"]:
             if not control['restart'] or \
@@ -511,18 +616,43 @@ def dft_risb(control, wan_hmat, imp):
 
         fullrun = control['iter_num_outer'] > 0 or \
                 control['start_prog'] in ["initcopy", "wannier"]
+        
+        # check_wannier_function_input creates comwann.ini        
         check_wannier_function_input(control, wan_hmat)
+        
+        # wannier_run:
+        #   - runs ComWann, but only if the fullrun argument it True
+        #   - reads wannier.inip, and uses it to set up control['impurity_wan']
+        #       control['impurity_wan'] is used only to populate params["corbs_list"] ,
+        #           which is passed to the gutzwiller solver.  
+        # wannier_run is implemented only for d,f, and not s,p shells.   
         wannier_run(control, wan_hmat, fullrun)
+        
         if control['iter_num_outer'] > 1 or \
                 control['start_prog'] in ["initcopy", "wannier", "gwann"]:
+                    
+            # gwannier_run:
+            #   - saves out various parameters into gwannier_params.pkl
+            #   - runs gwannier.py
+            #   - runs run_cygutz.py
+            #   - runs gwannden.py
             gwannier_run(control, wan_hmat, imp, control['iter_num_outer'])
+            
         if control['iter_num_outer'] > 1 or \
                 control['start_prog'] in ["initcopy", "wannier", \
                 "gwann", "dft"]:
+            # prepare_dft_input makes sure that  wannier_den_matrix.dat is in 
+            #       the right place for rspflapw to use it.
             prepare_dft_input(control)
+            
+            # run_dft runs rspflapw
             run_dft(control)
+            
         if control['end_prog'] in ["dft"]:
             break
+
+        # write_conv gathers info from rspflapw's out file, from GLog.h5,
+        #   and from GIter.h5, and writes it out in convergence.log        
         write_conv(control)
 
         # strict charge density convergence
@@ -533,15 +663,65 @@ def dft_risb(control, wan_hmat, imp):
                 abs(control['conv_table'][-1][2]- \
                 control['conv_table'][-2][2]) < control['ec']):
             break
+        
         control['iter_num_outer']=control['iter_num_outer']+1
 
 
 def lqsgw_risb(control, wan_hmat, imp):
+    
     control['h_log'].write("\n\n")
     control['iter_num_outer'] = 0
+    
+    # check_wannier_function_input creates comwann.ini
     check_wannier_function_input(control, wan_hmat)
+    
+    # wannier_run:
+    #   - runs ComWann
+    #   - reads wannier.inip, and uses it to set up control['impurity_wan']
+    #       control['impurity_wan'] is used only to populate params["corbs_list"] ,
+    #           which is passed to the gutzwiller solver.  
+    # wannier_run is implemented only for d,f, and not s,p shells.   
     wannier_run(control, wan_hmat)
+    
+    # gwannier_run:
+    #   - saves out various parameters into gwannier_params.pkl
+    #   - runs gwannier.py, which calls if_wannier in ifwannier.py
+    #   - runs run_cygutz.py, which calls run_cygutz from pygrisb.run.cygutz
+    #   - runs gwannden.py, which calls wannier_den_matrix in ifwannier.py
     gwannier_run(control, wan_hmat, imp, control['iter_num_outer'])
+
+
+# Some notes on the five fortran programs/exe's in  CyGUTZ:
+   
+# CyGErr, CyGErrR: program gerr
+#cygutz/exec_cygerr  - CyGErr
+#gerr: Function: calculate vector function error of Gutzwiller nonlinear equations.
+#
+#CyGInit, CyGInitR:  program ginit
+#cygutz/driver_cygutz - CyGInit 
+#ginit: 
+#! Function: initial processing, including necessary transformation 
+#!           of the bare Hamiltonian and append it 
+#!           to the "GBareH.h5" files, 
+#!           and generating initial solution vectors.
+#
+# CyGFinal, CyGFinalR: 
+#cygutz/driver_cygutz  - CyGFinal
+#cygutz/gfun_solver -  CyGFinal
+#gfinal:
+#! Function: calculate once more quasi-particle (qp) band structure,
+#!           total energy of the model, and optionally the renormalized
+#!           electron density.
+#
+# CyGBand, CyGBandR
+#cygutz/exec_cygband  - CyGBand
+#gbands:
+#! Function: calculate quasi-particle (qp) band structure
+#!           and qp local quantities.
+#
+#program exespci calls gspci_gh5exe, an exe named exe_spcir, exe_spci, 
+#   seems to be called by gs_driver/driver, which is called by cygutz/solve_hembed_list
+
 
 
 def log_time(control):
@@ -563,15 +743,27 @@ def log_time(control):
 
 def driver():
     t_start = time.time()
+    
     # delete venviron of GWIEN
     if "WIEN_GUTZ_ROOT" in os.environ:
         del os.environ["WIEN_GUTZ_ROOT"]
+
+    # init_comrisb:
+    #   - reads in  comrisb.ini
+    #   - loads ginit.json into  control['impurity_problem'] and control['impurity_solution']
+    #   - parses its arguments: 
+    #       -s or --startp sets control['start_prog']
+    #       -e or --endp sets control['end_prog']
+    #       -c or --continuous sets control['restart']        
     control,wan_hmat,imp = init_comrisb()
+    
     initial_file_directory_setup(control)
+    
     if control["method"] == "lqsgw+risb":
         lqsgw_risb(control, wan_hmat, imp)
     else:
         dft_risb(control, wan_hmat, imp)
+        
     t_end = time.time()
     control['t_total'] = t_end-t_start
     log_time(control)
